@@ -13,7 +13,7 @@ import { Dashboard } from "./components/Dashboard";
 import OrdersDashboard from "./components/Orders";
 import ProductsDashboard from "./components/Dashboard/Products";
 import { AddProduct } from "./components/Dashboard/Products/Add";
-import Shop from "./components/Shop";
+import { Shop } from "./components/Shop";
 
 function App() {
     return (
@@ -23,7 +23,7 @@ function App() {
                 <Routes>
                     <Route path='/' index element={<Home />} />
                     <Route path='/auth' element={<Authentication />} />
-                    <Route path='/shop' element={<Shop />} />
+                    <Route path='/products' element={<Shop />} />
                     <Route path='/account' element={<AuthenticatedOutlet />}>
                         <Route index element={<Profile />} />
                         <Route path='cart' element={<Cart />} />

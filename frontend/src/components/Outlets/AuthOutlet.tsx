@@ -6,7 +6,7 @@ const AuthenticatedOutlet = () => {
     const { status, user } = useAppSelector((state) => state.profile);
     const location = useLocation();
 
-    useEffect(() => {}, [status]);
+    useEffect(() => {}, [status, user]);
     return status === "authenticated" && user?.email ? (
         <AccountLayout>
             <Outlet />

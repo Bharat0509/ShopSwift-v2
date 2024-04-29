@@ -176,7 +176,7 @@ const Navbar = () => {
                 </Link>
 
                 <DropdownMenu>
-                    {status === "authenticated" ? (
+                    {status === "authenticated" && user?.email ? (
                         <DropdownMenuTrigger asChild>
                             <Button
                                 variant='outline'

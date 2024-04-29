@@ -46,7 +46,7 @@ export default function HomeProducts() {
                                 />
                             ))}
                         </div>
-                        <ScrollBar orientation='horizontal' />
+                        <ScrollBar orientation='horizontal' className='h-2' />
                     </ScrollArea>
                 </div>
             </div>
@@ -76,7 +76,7 @@ export default function HomeProducts() {
                                 />
                             ))}
                         </div>
-                        <ScrollBar orientation='horizontal' />
+                        <ScrollBar orientation='horizontal' className='h-2' />
                     </ScrollArea>
                 </div>
             </div>
@@ -106,7 +106,7 @@ export default function HomeProducts() {
                                 />
                             ))}
                         </div>
-                        <ScrollBar orientation='horizontal' />
+                        <ScrollBar orientation='horizontal' className='h-2' />
                     </ScrollArea>
                 </div>
             </div>
