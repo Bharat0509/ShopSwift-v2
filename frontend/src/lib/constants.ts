@@ -77,3 +77,47 @@ export const dashboardMenuItems = [
         icon: LineChart,
     },
 ];
+export const bannerContent = [
+    {
+        title: "Discover the Latest in Tech Gadgets",
+        description:
+            "Stay ahead of the curve with our newest collection of cutting-edge gadgets and electronics.",
+        buttonText: "Shop Now",
+        buttonLink: "/products/gadgets",
+    },
+    {
+        title: "Upgrade Your Wardrobe with Style",
+        description:
+            "Explore our trendy collection of clothing and accessories to elevate your fashion game.",
+        buttonText: "Explore Fashion",
+        buttonLink: "/products/clothing",
+    },
+    {
+        title: "Dive into the World of Knowledge",
+        description:
+            "Expand your mind with our vast selection of books covering various topics from fiction to self-help.",
+        buttonText: "Discover Books",
+        buttonLink: "/products/books",
+    },
+    {
+        title: "Enhance Your Living Space",
+        description:
+            "Transform your home with our range of top-quality appliances and furnishings.",
+        buttonText: "Shop Home Essentials",
+        buttonLink: "/products/home",
+    },
+    {
+        title: "Stay Active and Healthy",
+        description:
+            "Achieve your fitness goals with our range of sports gear and outdoor equipment.",
+        buttonText: "Explore Sports",
+        buttonLink: "/products/sports",
+    },
+    {
+        title: "Pamper Yourself with Beauty Essentials",
+        description:
+            "Indulge in self-care with our collection of skincare, makeup, and grooming products.",
+        buttonText: "Shop Beauty",
+        buttonLink: "/products/beauty",
+    },
+];

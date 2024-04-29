@@ -11,7 +11,7 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import {
@@ -58,8 +58,8 @@ const Authentication = () => {
             dispatch(authSuccess(data.user));
         } catch (e: unknown) {
             if (e instanceof AxiosError) {
-                dispatch(authFailure(e?.response?.data?.error));
-                toast.error(e?.response?.data?.error);
+                dispatch(authFailure(e?.message));
+                toast.error(e?.message);
             } else {
                 console.error("Unexpected error:", e);
 
@@ -168,14 +168,32 @@ const Authentication = () => {
                                                     placeholder='********'
                                                 />
                                             </FormControl>
+                                            {!isRegister && (
+                                                <div className='flex w-full '>
+                                                    <Link
+                                                        to='/forgot-password'
+                                                        className='text-sm ml-auto hover:underline'
+                                                    >
+                                                        Forgot password?
+                                                    </Link>
+                                                </div>
+                                            )}
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                                <Button type='submit' className='w-full'>
+                                <Button
+                                    type='submit'
+                                    className='w-full'
+                                    disabled={loading}
+                                >
                                     {isRegister ? "Sign Up" : "Login"}
                                 </Button>
-                                <Button variant='outline' className='w-full'>
+                                <Button
+                                    variant='outline'
+                                    disabled
+                                    className='w-full'
+                                >
                                     {isRegister
                                         ? "Sign up with Google"
                                         : "Login with Google"}
