@@ -110,7 +110,7 @@ export default function Profile() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link href='#'>Account</Link>
+                            <Link to='#'>Account</Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />

@@ -117,13 +117,13 @@ export default function HomeCarousel() {
                                 <div className='flex gap-4'>
                                     <Link
                                         className='inline-flex h-12 items-center justify-center rounded-md bg-white px-8 text-sm font-medium text-gray-900 shadow-sm transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50'
-                                        href='#'
+                                        to='#'
                                     >
                                         Get Started
                                     </Link>
                                     <Link
                                         className='inline-flex h-12 items-center justify-center rounded-md border border-gray-200 px-8 text-sm font-medium text-white shadow-sm transition-colors hover:bg-white hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800'
-                                        href='#'
+                                        to='#'
                                     >
                                         Learn More
                                     </Link>

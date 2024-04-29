@@ -41,7 +41,7 @@ export function Dashboard() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link href='#'>Dashboard</Link>
+                            <Link to='#'>Dashboard</Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
@@ -118,7 +118,7 @@ export function Dashboard() {
                             </CardDescription>
                         </div>
                         <Button asChild size='sm' className='ml-auto gap-1'>
-                            <Link href='#'>
+                            <Link to='#'>
                                 View All
                                 <ArrowUpRight className='h-4 w-4' />
                             </Link>

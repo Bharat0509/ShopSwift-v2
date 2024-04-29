@@ -54,13 +54,13 @@ export default function ProductsDashboard() {
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href='#'>Dashboard</Link>
+                                <Link to='#'>Dashboard</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href='#'>Products</Link>
+                                <Link to='#'>Products</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
