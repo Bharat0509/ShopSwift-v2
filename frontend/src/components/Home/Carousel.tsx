@@ -74,6 +74,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "../ui/button";
 
 export default function HomeCarousel() {
     return (
@@ -106,26 +107,19 @@ export default function HomeCarousel() {
                             />
                             <div className='absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent' />
                             <div className='absolute inset-0 flex flex-col items-center justify-center px-4 text-center space-y-6 md:space-y-8 text-secondary-foreground/75'>
-                                <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight '>
+                                <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight dark:text-primary/75'>
                                     Discover the Future of Web Development
                                 </h1>
-                                <p className='text-lg md:text-xl lg:text-2xl max-w-[800px] line-clamp-2'>
+                                <p className='text-lg md:text-xl lg:text-2xl max-w-[800px] line-clamp-2 dark:text-secondary'>
                                     Unlock the power of our cutting-edge
                                     platform and revolutionize the way you build
                                     and deploy your web applications.
                                 </p>
                                 <div className='flex gap-4'>
-                                    <Link
-                                        className='inline-flex h-12 items-center justify-center rounded-md bg-white px-8 text-sm font-medium text-gray-900 shadow-sm transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50'
-                                        to='#'
-                                    >
-                                        Get Started
-                                    </Link>
-                                    <Link
-                                        className='inline-flex h-12 items-center justify-center rounded-md border border-gray-200 px-8 text-sm font-medium text-white shadow-sm transition-colors hover:bg-white hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800'
-                                        to='#'
-                                    >
-                                        Learn More
+                                    <Link to='/account/cart'>
+                                        <Button variant='secondary'>
+                                            Learn More
+                                        </Button>
                                     </Link>
                                 </div>
                             </div>

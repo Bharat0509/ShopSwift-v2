@@ -71,7 +71,7 @@ const Authentication = () => {
             <div className='flex items-center justify-center py-12 bg-muted'>
                 <form
                     onSubmit={handleSubmit(onSubmit)}
-                    className='flex items-center justify-center py-12 border border-muted bg-white px-12'
+                    className='flex items-center justify-center py-12 border border-muted px-12 dark:bg-black/50 rounded-xl'
                 >
                     <div className='mx-auto grid w-[350px] gap-6'>
                         <div className='grid gap-2 text-center'>

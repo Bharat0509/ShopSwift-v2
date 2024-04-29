@@ -7,6 +7,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const Axios = axios.create({
-    baseURL: "http://localhost:4000",
+    baseURL: import.meta.env.BACKEND_API_BASE_URL,
     withCredentials: true,
 });
