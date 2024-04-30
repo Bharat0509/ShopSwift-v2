@@ -26,6 +26,13 @@ import {
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
+import { ProductCard } from "../ProductCard/product-card";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useEffect } from "react";
+import {
+    fetchAppProducts,
+    fetchDashboardProducts,
+} from "@/redux/features/appSlice";
 
 const categories = [
     {
@@ -73,6 +80,8 @@ const defaultValues: Partial<DisplayFormValues> = {
     rating: "1 Start or more",
 };
 export function Shop() {
+    const dispatch = useAppDispatch();
+    const { products } = useAppSelector((state) => state.app);
     const form = useForm<DisplayFormValues>({
         resolver: zodResolver(displayFormSchema),
         defaultValues,
@@ -80,7 +89,11 @@ export function Shop() {
     function onSubmit(data: DisplayFormValues) {
         console.log(data);
     }
-
+    useEffect(() => {
+        if (!products?.length) {
+            dispatch(fetchAppProducts());
+        }
+    }, [dispatch, products?.length]);
     return (
         <div className='grid h-[calc(100vh-64px)] fixed w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
             <div className='hidden border-r bg-muted/40 md:block'>
@@ -469,10 +482,21 @@ export function Shop() {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </header>
-                <main className='flex items-center justify-center w-full h-80'>
-                    <h3 className='text-2xl font-bold tracking-tight'>
-                        we don't have products to show.
-                    </h3>
+                <main className='flex items-center justify-center w-full  p-2 md:p-4 overflow-scroll'>
+                    <div className='flex gap-2 flex-wrap overflow-scroll h-[85vh]'>
+                        {(products || []).map((product) => (
+                            <ProductCard
+                                key={product._id}
+                                product={product}
+                                className='w-[150px] md:w-[200px] lg:w-[250px]'
+                                width={250}
+                                height={250}
+                            />
+                        ))}
+                    </div>
+
+                    {/* <ScrollBar orientation='horizontal' className='h-2' /> */}
+                    {/* </ScrollArea> */}
                 </main>
             </div>
         </div>

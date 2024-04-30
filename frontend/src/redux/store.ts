@@ -1,12 +1,14 @@
 // store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import profileReducer from "./features/profileSlice";
+import appSlice from "./features/appSlice";
+import authSlice from "./features/authSlice";
 import dashboardReducer from "./features/dashboardSlice";
 
 export const store = configureStore({
     reducer: {
-        profile: profileReducer,
+        auth: authSlice,
         dashboard: dashboardReducer,
+        app: appSlice,
     },
 });
 

@@ -12,8 +12,8 @@ export default function HomeProducts() {
         const fetchProducts = () => {
             fetch("http://localhost:4000/api/v1/products")
                 .then((res) => res.json())
-                .then((data) => {
-                    setProducts(data.products);
+                .then((res) => {
+                    setProducts(res.data.products);
                 });
         };
         fetchProducts();
@@ -40,7 +40,7 @@ export default function HomeProducts() {
                                 <ProductCard
                                     key={product._id}
                                     product={product}
-                                    className='w-[250px]'
+                                    className='w-[150px] md:w-[200px] lg:w-[250px]'
                                     width={250}
                                     height={250}
                                 />
@@ -70,7 +70,7 @@ export default function HomeProducts() {
                                 <ProductCard
                                     key={product._id}
                                     product={product}
-                                    className='w-[250px]'
+                                    className='w-[150px] md:w-[200px] lg:w-[250px]'
                                     width={250}
                                     height={250}
                                 />
@@ -100,7 +100,7 @@ export default function HomeProducts() {
                                 <ProductCard
                                     key={product._id}
                                     product={product}
-                                    className='w-[250px]'
+                                    className='w-[150px] md:w-[200px] lg:w-[250px]'
                                     width={250}
                                     height={250}
                                 />

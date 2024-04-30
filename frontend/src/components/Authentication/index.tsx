@@ -3,9 +3,9 @@ import {
     authFailure,
     authRequest,
     authSuccess,
-} from "@/redux/features/profileSlice";
+    selectAuthObject,
+} from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -38,9 +38,7 @@ const Authentication = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { loading, status, user } = useAppSelector(
-        (state: RootState) => state.profile
-    );
+    const { loading, status, user } = useAppSelector(selectAuthObject);
     const [isRegister, setIsRegister] = useState<boolean>(false);
 
     const form = useForm<z.infer<typeof schema>>({
@@ -54,8 +52,11 @@ const Authentication = () => {
     const onSubmit: SubmitHandler<FormSchema> = async (userData) => {
         dispatch(authRequest());
         try {
-            const { data } = await Axios.post("/api/v1/login", userData);
-            dispatch(authSuccess(data.user));
+            const { data: result } = await Axios.post(
+                "/api/v1/login",
+                userData
+            );
+            dispatch(authSuccess(result.data));
         } catch (e: unknown) {
             if (e instanceof AxiosError) {
                 dispatch(authFailure(e?.message));

@@ -28,7 +28,7 @@ export default function HomeCarousel() {
             >
                 <CarouselContent>
                     {bannerContent.map((banner) => (
-                        <CarouselItem>
+                        <CarouselItem key={banner.title}>
                             <div className='relative w-full h-[300px] md:h-[350px] lg:h-[400px] overflow-hidden'>
                                 <img
                                     alt='Banner 1'

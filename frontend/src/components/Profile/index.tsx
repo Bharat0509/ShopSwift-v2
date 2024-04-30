@@ -29,6 +29,7 @@ import { AxiosError } from "axios";
 import { Pencil } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { selectAuthObject } from "@/redux/features/authSlice";
 
 const profileFormSchema = z.object({
     name: z
@@ -50,7 +51,7 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function Profile() {
-    const { user } = useAppSelector((state) => state.profile);
+    const { user } = useAppSelector(selectAuthObject);
 
     const defaultValues: Partial<ProfileFormValues> = {
         name: user?.name ?? "user",

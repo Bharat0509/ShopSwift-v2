@@ -11,9 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navMenuItems } from "@/lib/constants";
-import { Axios } from "@/lib/utils";
-import { authSuccess } from "@/redux/features/profileSlice";
-import { useAppSelector } from "@/redux/hooks";
+import { fetchProfile, selectAuthObject } from "@/redux/features/authSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
     LayoutDashboard,
     Menu,
@@ -25,23 +24,18 @@ import {
     UserRound,
 } from "lucide-react";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const Navbar = () => {
     const { setTheme } = useTheme();
-    const dispatch = useDispatch();
-    const { status, user } = useAppSelector((state) => state.profile);
+    const dispatch = useAppDispatch();
+    const { status, user, access_token } = useAppSelector(selectAuthObject);
     useEffect(() => {
-        const getProfile = async () => {
-            const { data } = await Axios.get("/api/v1/me");
-            dispatch(authSuccess(data.user));
-        };
         if (status !== "authenticated") {
-            getProfile();
+            dispatch(fetchProfile(access_token));
         }
-    }, [dispatch, status]);
+    }, [access_token, dispatch, status]);
 
     return (
         <header className='sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50'>
@@ -201,7 +195,7 @@ const Navbar = () => {
                             </Button>
                         </DropdownMenuTrigger>
                     ) : (
-                        <Link to='/account/cart'>
+                        <Link to='/auth'>
                             <Button
                                 variant='outline'
                                 size='icon'

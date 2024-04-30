@@ -4,9 +4,10 @@ import { navMenuItems } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/redux/hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { selectAuthObject } from "@/redux/features/authSlice";
 
 export function AccountLayout({ children }: { children: React.ReactNode }) {
-    const { user } = useAppSelector((state) => state.profile);
+    const { user } = useAppSelector(selectAuthObject);
     const location = useLocation();
 
     return (
