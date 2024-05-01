@@ -2,22 +2,15 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
 
 import { IProduct } from "@/lib/typing";
-import { useEffect, useState } from "react";
+import { useGetProductsQuery } from "@/redux/features/appApiSlice";
+import Spinner from "../ui/spinner";
 import { ProductCard } from "./product-card";
-
+interface IProductsData {
+    productsCount: number;
+    products: IProduct[];
+}
 export default function HomeProducts() {
-    const [products, setProducts] = useState<IProduct[]>([]);
-
-    useEffect(() => {
-        const fetchProducts = () => {
-            fetch("http://localhost:4000/api/v1/products")
-                .then((res) => res.json())
-                .then((res) => {
-                    setProducts(res.data.products);
-                });
-        };
-        fetchProducts();
-    }, []);
+    const { data, isSuccess } = useGetProductsQuery("products");
 
     return (
         <>
@@ -34,20 +27,29 @@ export default function HomeProducts() {
                 </div>
                 <Separator className='my-4' />
                 <div className='relative'>
-                    <ScrollArea>
-                        <div className='flex space-x-4 pb-4'>
-                            {(products || []).map((product) => (
-                                <ProductCard
-                                    key={product._id}
-                                    product={product}
-                                    className='w-[150px] md:w-[200px] lg:w-[250px]'
-                                    width={250}
-                                    height={250}
-                                />
-                            ))}
-                        </div>
-                        <ScrollBar orientation='horizontal' className='h-2' />
-                    </ScrollArea>
+                    {isSuccess ? (
+                        <ScrollArea>
+                            <div className='flex space-x-4 pb-4'>
+                                {(data as IProductsData).products.map(
+                                    (product: IProduct) => (
+                                        <ProductCard
+                                            key={product._id}
+                                            product={product}
+                                            className='w-[150px] md:w-[200px] lg:w-[250px]'
+                                            width={250}
+                                            height={250}
+                                        />
+                                    )
+                                )}
+                            </div>
+                            <ScrollBar
+                                orientation='horizontal'
+                                className='h-2'
+                            />
+                        </ScrollArea>
+                    ) : (
+                        <Spinner />
+                    )}
                 </div>
             </div>
 
@@ -64,20 +66,29 @@ export default function HomeProducts() {
                 </div>
                 <Separator className='my-4' />
                 <div className='relative'>
-                    <ScrollArea>
-                        <div className='flex space-x-4 pb-4'>
-                            {(products || []).map((product) => (
-                                <ProductCard
-                                    key={product._id}
-                                    product={product}
-                                    className='w-[150px] md:w-[200px] lg:w-[250px]'
-                                    width={250}
-                                    height={250}
-                                />
-                            ))}
-                        </div>
-                        <ScrollBar orientation='horizontal' className='h-2' />
-                    </ScrollArea>
+                    {isSuccess ? (
+                        <ScrollArea>
+                            <div className='flex space-x-4 pb-4'>
+                                {(data as IProductsData).products.map(
+                                    (product: IProduct) => (
+                                        <ProductCard
+                                            key={product._id}
+                                            product={product}
+                                            className='w-[150px] md:w-[200px] lg:w-[250px]'
+                                            width={250}
+                                            height={250}
+                                        />
+                                    )
+                                )}
+                            </div>
+                            <ScrollBar
+                                orientation='horizontal'
+                                className='h-2'
+                            />
+                        </ScrollArea>
+                    ) : (
+                        <Spinner />
+                    )}
                 </div>
             </div>
 
@@ -94,20 +105,29 @@ export default function HomeProducts() {
                 </div>
                 <Separator className='my-4' />
                 <div className='relative'>
-                    <ScrollArea>
-                        <div className='flex space-x-4 pb-4'>
-                            {(products || []).map((product) => (
-                                <ProductCard
-                                    key={product._id}
-                                    product={product}
-                                    className='w-[150px] md:w-[200px] lg:w-[250px]'
-                                    width={250}
-                                    height={250}
-                                />
-                            ))}
-                        </div>
-                        <ScrollBar orientation='horizontal' className='h-2' />
-                    </ScrollArea>
+                    {isSuccess ? (
+                        <ScrollArea>
+                            <div className='flex space-x-4 pb-4'>
+                                {(data as IProductsData).products.map(
+                                    (product: IProduct) => (
+                                        <ProductCard
+                                            key={product._id}
+                                            product={product}
+                                            className='w-[150px] md:w-[200px] lg:w-[250px]'
+                                            width={250}
+                                            height={250}
+                                        />
+                                    )
+                                )}
+                            </div>
+                            <ScrollBar
+                                orientation='horizontal'
+                                className='h-2'
+                            />
+                        </ScrollArea>
+                    ) : (
+                        <Spinner />
+                    )}
                 </div>
             </div>
         </>

@@ -15,6 +15,7 @@ import ProductsDashboard from "./components/Dashboard/Products";
 import { AddProduct } from "./components/Dashboard/Products/Add";
 import { Shop } from "./components/Shop";
 import LogOut from "./components/LogOut";
+import ProductInfo from "./components/ProductDetail";
 
 function App() {
     return (
@@ -26,6 +27,10 @@ function App() {
                     <Route path='/auth' element={<Authentication />} />
                     <Route path='/logOut' element={<LogOut />} />
                     <Route path='/products' element={<Shop />} />
+                    <Route
+                        path='/products/:productId'
+                        element={<ProductInfo />}
+                    />
                     <Route path='/account' element={<AuthenticatedOutlet />}>
                         <Route index element={<Profile />} />
                         <Route path='cart' element={<Cart />} />

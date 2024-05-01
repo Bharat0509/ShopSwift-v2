@@ -5,6 +5,17 @@ import User, { IUser } from "../models/user";
 import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
+import { Queue } from "bullmq";
+import { sendWelcomeEmail } from "../emailTemplates";
+
+export const emailQueue = new Queue("email-Q", {
+    connection: {
+        host: "redis-1b116726-bhartbhammar3336-28e2.h.aivencloud.com",
+        port: 16393,
+        username: "default",
+        password: "AVNS_7m2CBEJrsIdw3xsEq8X",
+    },
+});
 
 // Define a custom property on the Request object to store decoded user information
 declare global {
@@ -23,6 +34,8 @@ declare global {
 const handleLogin = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { email, password } = req.body;
+
+        await sendWelcomeEmail();
 
         if (!email || !password) {
             throw new ApiError(400, "email and password are required.");

@@ -48,7 +48,7 @@ export function ProductCard({
                         ${product.price}
                     </span>
                     <Link
-                        to={`/product/${product._id}`}
+                        to={`/products/${product._id}`}
                         className='border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground whitespace-nowrap w-fit flex p-1 rounded-md text-sm font-medium md:p-2'
                     >
                         View{" "}

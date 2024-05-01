@@ -9,15 +9,25 @@ export const appApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: ({ data }) => data,
         }),
-        products: builder.query({
-            query: (profileData) => ({
+        getProducts: builder.query({
+            query: () => ({
                 url: "/api/v1/products",
                 method: "GET",
-                body: { ...profileData },
+            }),
+            transformResponse: ({ data }) => data,
+        }),
+        getProductsById: builder.query({
+            query: ({ productId }) => ({
+                url: `/api/v1/products/${productId}`,
+                method: "GET",
             }),
             transformResponse: ({ data }) => data,
         }),
     }),
 });
 
-export const { useGetMyOrdersQuery, useProductsQuery } = appApiSlice;
+export const {
+    useGetProductsQuery,
+    useGetMyOrdersQuery,
+    useGetProductsByIdQuery,
+} = appApiSlice;

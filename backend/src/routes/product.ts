@@ -21,7 +21,7 @@ router
     .route("/admin/products")
     .get([verifyJWT, authorizeRoles("admin"), getAdminProducts]);
 
-router.route("/product/:id").get(getProductDetails);
+router.route("/products/:id").get(getProductDetails);
 
 router.route("/products/new").post(createProduct);
 
