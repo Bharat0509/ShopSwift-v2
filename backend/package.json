@@ -2,9 +2,10 @@
   "name": "ts-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon dist/index.js",
+    "start": "tsc --watch"
   },
   "keywords": [],
   "author": "",

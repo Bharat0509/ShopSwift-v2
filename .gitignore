@@ -26,3 +26,6 @@ dist-ssr
 # Ignore the modlue directory
 node_modules/*
 */node_modules
+
+**/*/.env
+backend/.env
