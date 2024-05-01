@@ -2,6 +2,8 @@
 import { IOrder, IProduct } from "@/lib/typing";
 import { Axios } from "@/lib/utils";
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { RootState } from "../store";
+import { AxiosRequestConfig } from "axios";
 
 interface DashboardState {
     loading: boolean;
@@ -71,9 +73,16 @@ const dashboardSlice = createSlice({
 // Define the async thunk to fetch dashboard products
 export const fetchDashboardProducts = createAsyncThunk(
     "dashboard/fetchDashboardProducts",
-    async () => {
+    async (_, { getState }) => {
         try {
-            const response = await Axios.get("/api/v1/admin/products");
+            const state = getState() as RootState;
+
+            // const accessToken = getState().auth.access_token;
+            const response = await Axios.get("/api/v1/admin/products", {
+                headers: {
+                    Authorization: `Bearer ${state.auth.access_token}`,
+                },
+            });
             return response.data.products as IProduct[];
         } catch (error) {
             throw new Error("Failed to fetch dashboard products");
@@ -84,14 +93,27 @@ export const fetchDashboardProducts = createAsyncThunk(
 // Define the async thunk to fetch dashboard orders
 export const fetchDashboardOrders = createAsyncThunk(
     "dashboard/fetchDashboardOrders",
-    async () => {
+    async (_, { getState }) => {
         try {
-            const response = await Axios.get("/api/v1/admin/orders");
+            const state = getState() as RootState;
+            const axiosOptions: AxiosRequestConfig = {
+                headers: {
+                    Authorization: `Bearer ${state.auth.access_token}`,
+                },
+            };
+            // const accessToken = getState().auth.access_token;
+            const response = await Axios.get(
+                "/api/v1/admin/orders",
+                axiosOptions
+            );
             return response.data.orders as IOrder[];
         } catch (error) {
             throw new Error("Failed to fetch dashboard orders");
         }
     }
 );
+
+export const selectOrders = (state: RootState) => state.dashboard.orders;
+export const selectProducts = (state: RootState) => state.dashboard.products;
 
 export default dashboardSlice.reducer;

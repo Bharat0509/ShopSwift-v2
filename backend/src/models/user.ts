@@ -99,9 +99,18 @@ userSchema.methods.comparePassword = async function (enteredPassword: string) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-    return jwt.sign({ userId: this._id }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: process.env.ACCESS_TOKEN_SECRET_EXPIRES_IN,
-    });
+    return jwt.sign(
+        {
+            userId: this._id,
+            name: this.name,
+            email: this.email,
+            role: this.role,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_SECRET_EXPIRES_IN,
+        }
+    );
 };
 
 userSchema.methods.generatePasswordResetToken = function () {
@@ -115,9 +124,18 @@ userSchema.methods.generatePasswordResetToken = function () {
 };
 
 userSchema.methods.generateRefreshToken = function () {
-    return jwt.sign({ userId: this._id }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_SECRET_EXPIRES_IN,
-    });
+    return jwt.sign(
+        {
+            userId: this._id,
+            name: this.name,
+            email: this.email,
+            role: this.role,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_SECRET_EXPIRES_IN,
+        }
+    );
 };
 
 const User: Model<IUser> = mongoose.model("User", userSchema);

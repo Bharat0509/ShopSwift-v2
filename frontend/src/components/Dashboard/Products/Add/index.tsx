@@ -34,13 +34,13 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Axios, cn } from "@/lib/utils";
-import { AxiosError } from "axios";
+import { cn } from "@/lib/utils";
+import { useAddProductMutation } from "@/redux/features/dashboardApiSlice";
 import { ChevronLeft, PlusCircle, Upload } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as z from "zod";
 
 const schema = z.object({
@@ -79,6 +79,8 @@ export function AddProduct() {
         }
     );
 
+    const [addProduct, result] = useAddProductMutation();
+    const navigate = useNavigate();
     const handleProductImagesChange = (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
@@ -102,23 +104,34 @@ export function AddProduct() {
         });
     };
     const onSubmit: SubmitHandler<FormSchema> = async (productDetails) => {
-        try {
-            const { data } = await Axios.post("/api/v1/products/new", {
-                ...productDetails,
-                images: imagesPreview,
+        const toastId = toast.loading("Creating product...");
+        await addProduct({ ...productDetails, images: imagesPreview });
+
+        if (!result.isLoading && result.isSuccess) {
+            toast.success("Product Created", { id: toastId });
+            navigate("/dashboard/products");
+        } else {
+            toast.error(`Failed to create product : ${result.error}`, {
+                id: toastId,
             });
-            toast("Success");
-            console.log(data);
-        } catch (e: unknown) {
-            if (e instanceof AxiosError) {
-                toast.error(e?.response?.data?.error);
-            } else {
-                console.error("Unexpected error:", e);
-                toast.error(
-                    "An unexpected error occurred. Please try again later."
-                );
-            }
         }
+        // try {
+        //     const { data } = await Axios.post("/api/v1/products/new", {
+        //         ...productDetails,
+        //         images: imagesPreview,
+        //     });
+        //     toast("Success");
+        //     console.log(data);
+        // } catch (e: unknown) {
+        //     if (e instanceof AxiosError) {
+        //         toast.error(e?.response?.data?.error);
+        //     } else {
+        //         console.error("Unexpected error:", e);
+        //         toast.error(
+        //             "An unexpected error occurred. Please try again later."
+        //         );
+        //     }
+        // }
     };
     return (
         <div className='p-4 sm:p-6'>

@@ -1,4 +1,4 @@
-import { DeleteIcon, MoreHorizontal, Pencil, PlusCircle } from "lucide-react";
+import { MoreHorizontal, Pencil, PlusCircle, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -34,14 +34,15 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { IProduct } from "@/lib/typing";
+import { useGetAdminProductsQuery } from "@/redux/features/dashboardApiSlice";
 import { fetchDashboardProducts } from "@/redux/features/dashboardSlice";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useAppDispatch } from "@/redux/hooks";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function ProductsDashboard() {
     const dispatch = useAppDispatch();
-    const { loading, products } = useAppSelector((state) => state.dashboard);
+    const { data, isLoading } = useGetAdminProductsQuery("dashboard-orders");
 
     useEffect(() => {
         dispatch(fetchDashboardProducts());
@@ -86,7 +87,7 @@ export default function ProductsDashboard() {
                 </div>
             </CardHeader>
             <CardContent>
-                {loading ? (
+                {isLoading ? (
                     <>
                         {[1, 2, 3, 4, 5].map((item) => (
                             <TableRow key={item}>
@@ -142,7 +143,7 @@ export default function ProductsDashboard() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {products?.map((product: IProduct) => (
+                            {data?.products?.map((product: IProduct) => (
                                 <TableRow key={product._id}>
                                     <TableCell className='hidden sm:table-cell'>
                                         <img
@@ -201,7 +202,8 @@ export default function ProductsDashboard() {
                                                         className='w-full flex items-center gap-2'
                                                         to={`/products/${product._id}/delete`}
                                                     >
-                                                        <DeleteIcon /> Delete
+                                                        <Trash2 size={16} />{" "}
+                                                        Delete
                                                     </Link>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -216,7 +218,7 @@ export default function ProductsDashboard() {
             <CardFooter>
                 <div className='text-xs text-muted-foreground'>
                     Showing <strong>1-10</strong> of{" "}
-                    <strong>{products?.length}</strong> products
+                    <strong>{data?.products?.length}</strong> products
                 </div>
             </CardFooter>
         </Card>

@@ -27,7 +27,7 @@ import { Separator } from "../ui/separator";
 
 export default function Cart() {
     return (
-        <Card className='bg-secondary'>
+        <Card>
             <CardHeader>
                 <CardTitle className='text-lg'>Your Cart</CardTitle>
                 <CardDescription>
@@ -36,7 +36,7 @@ export default function Cart() {
             </CardHeader>
             <CardContent>
                 <div className='lg:flex gap-4'>
-                    <Table className='border border-secondary bg-white '>
+                    <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead className='hidden w-[100px] sm:table-cell'>
@@ -113,7 +113,7 @@ export default function Cart() {
                         <CardContent className='p-6 text-sm'>
                             <div className='grid gap-3'>
                                 <div className='font-semibold'>
-                                    Payment Details
+                                    Order Summary
                                 </div>
 
                                 <Separator className='my-2' />

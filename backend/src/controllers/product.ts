@@ -4,16 +4,19 @@ import Product from "../models/product";
 import ApiError from "../utils/ApiError";
 import asyncHandler from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/ApiResponse";
-
 // Define a custom property on the Request object to store decoded user information
 declare global {
     namespace Express {
         interface Request {
-            user?: string;
+            user?: {
+                userId: string;
+                name: string;
+                email: string;
+                role: string;
+            };
         }
     }
 }
-
 // Create Product
 export const createProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -25,17 +28,18 @@ export const createProduct = asyncHandler(
         }
 
         const imagesLink: { public_id: string; url: string }[] = [];
-        for (let i = 0; i < images.length; i++) {
-            const result = await cloudinary.v2.uploader.upload(images[i], {
-                folder: "products",
-            });
-            imagesLink.push({
-                public_id: result.public_id,
-                url: result.secure_url,
-            });
-        }
+        // for (let i = 0; i < images.length; i++) {
+        //     const result = await cloudinary.v2.uploader.upload(images[i], {
+        //         folder: "products",
+        //     });
+        //     imagesLink.push({
+        //         public_id: result.public_id,
+        //         url: result.secure_url,
+        //     });
+        // }
         req.body.images = imagesLink;
-        req.body.user = req.user;
+        req.body.user = req.user.userId;
+        req.body.name = req.body.productName;
         const product = await Product.create(req.body);
         const apiResponse = new ApiResponse(
             201,

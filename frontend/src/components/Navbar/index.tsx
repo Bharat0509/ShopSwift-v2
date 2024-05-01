@@ -11,7 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navMenuItems } from "@/lib/constants";
-import { fetchProfile, selectAuthObject } from "@/redux/features/authSlice";
+import { useMeQuery } from "@/redux/features/authApiSlice";
+import { authSuccess, selectAuthObject } from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
     LayoutDashboard,
@@ -23,19 +24,20 @@ import {
     Sun,
     UserRound,
 } from "lucide-react";
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useEffect } from "react";
 
 const Navbar = () => {
     const { setTheme } = useTheme();
+    const { user, status } = useAppSelector(selectAuthObject);
     const dispatch = useAppDispatch();
-    const { status, user, access_token } = useAppSelector(selectAuthObject);
+    const { isSuccess, data: result } = useMeQuery("user");
     useEffect(() => {
-        if (status !== "authenticated") {
-            dispatch(fetchProfile(access_token));
+        if (isSuccess) {
+            dispatch(authSuccess(result?.data));
         }
-    }, [access_token, dispatch, status]);
+    }, [dispatch, isSuccess, result?.data]);
 
     return (
         <header className='sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50'>

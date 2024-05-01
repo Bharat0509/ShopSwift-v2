@@ -24,10 +24,10 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Axios } from "@/lib/utils";
-import { AxiosError } from "axios";
+// import { Axios } from "@/lib/utils";
+// import { AxiosError } from "axios";
 import { Pencil } from "lucide-react";
-import { toast } from "react-hot-toast";
+// import { toast } from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { selectAuthObject } from "@/redux/features/authSlice";
 
@@ -51,7 +51,7 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function Profile() {
-    const { user } = useAppSelector(selectAuthObject);
+    const { user, access_token } = useAppSelector(selectAuthObject);
 
     const defaultValues: Partial<ProfileFormValues> = {
         name: user?.name ?? "user",
@@ -65,21 +65,25 @@ export default function Profile() {
     });
 
     async function onSubmit(profileData: ProfileFormValues) {
-        const profileUpdateToastId = toast.loading("Updating Profile...");
-        try {
-            await Axios.put("/api/v1/me/update", profileData);
-            toast.success("Profile Updated !", { id: profileUpdateToastId });
-        } catch (e: unknown) {
-            if (e instanceof AxiosError) {
-                toast.error(e?.response?.data?.error);
-            } else {
-                console.error("Unexpected error:", e);
-                toast.error(
-                    "An unexpected error occurred. Please try again later."
-                );
-            }
-            toast.error("Something Went wrong.");
-        }
+        // const profileUpdateToastId = toast.loading("Updating Profile...", {
+        //     duration: 5000,
+        // });
+        // try {
+        //     await Axios.put("/api/v1/me/update", profileData, {
+        //         headers: {
+        //             Authorization: `Bearer ${access_token}`,
+        //         },
+        //     });
+        //     toast.success("Profile Updated !", { id: profileUpdateToastId });
+        // } catch (e: unknown) {
+        //     let error: string = "Something went wrong. please try again";
+        //     if (e instanceof AxiosError) {
+        //         error = e?.response?.data?.error;
+        //     } else {
+        //         error = "An unexpected error occurred. Please try again later.";
+        //     }
+        //     toast.error(error, { id: profileUpdateToastId });
+        // }
     }
 
     const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -4,7 +4,6 @@ import {
     CardContent,
     CardDescription,
     CardHeader,
-    CardTitle,
 } from "@/components/ui/card";
 import {
     Table,
@@ -14,10 +13,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { IOrder } from "@/lib/typing";
 import { cn } from "@/lib/utils";
-import { fetchDashboardOrders } from "@/redux/features/dashboardSlice";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { useEffect } from "react";
+import { useGetMyOrdersQuery } from "@/redux/features/appApiSlice";
 import { Link } from "react-router-dom";
 import {
     Breadcrumb,
@@ -27,39 +25,43 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "../ui/breadcrumb";
+import { Skeleton } from "../ui/skeleton";
+import { toast } from "react-hot-toast";
 
 export default function Component() {
-    const dispatch = useAppDispatch();
-    const { orders } = useAppSelector((state) => state.dashboard);
-
-    useEffect(() => {
-        dispatch(fetchDashboardOrders());
-    }, [dispatch]);
+    const { isLoading, data, isError } = useGetMyOrdersQuery({
+        refetchOnFocus: true,
+        pollingInterval: 500,
+    });
+    const result = data as { orders: IOrder[] };
+    if (isError) {
+        toast.error("Failed to fetch orders.");
+    }
     return (
         <Card>
-            <CardHeader className='px-7'>
+            <CardHeader className='px-4 lg:px-8'>
                 <Breadcrumb className='hidden md:flex'>
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link to='#'>Dashboard</Link>
+                                <Link to='#'>Account</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link to='#'>Products</Link>
+                                <Link to='#'>Orders</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                            <BreadcrumbPage>All Products</BreadcrumbPage>
+                            <BreadcrumbPage>All Orders</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <CardTitle>Orders</CardTitle>
+
                 <CardDescription>
-                    Recent orders from your store.
+                    Your recent orders from our store.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -67,50 +69,86 @@ export default function Component() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Customer</TableHead>
-                            <TableHead className='hidden sm:table-cell'>
+                            <TableHead className='hidden sm:table-cell text-center'>
                                 Type
                             </TableHead>
-                            <TableHead className='hidden sm:table-cell'>
+                            <TableHead className='hidden sm:table-cell text-center'>
                                 Status
                             </TableHead>
-                            <TableHead className='hidden md:table-cell'>
+                            <TableHead className='hidden md:table-cell text-center '>
                                 Date
                             </TableHead>
-                            <TableHead className='text-right'>Amount</TableHead>
+                            <TableHead className='text-center'>
+                                Amount
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orders?.map((order, index) => (
-                            <TableRow
-                                className={cn([index % 2 && "bg-accent"])}
-                            >
-                                <TableCell>
-                                    <div className='font-medium'>
-                                        {"Liam Doe"}
-                                    </div>
-                                    <div className='hidden text-sm text-muted-foreground md:inline'>
-                                        {"liam@gmail.com"}
-                                    </div>
-                                </TableCell>
-                                <TableCell className='hidden sm:table-cell'>
-                                    Sale
-                                </TableCell>
-                                <TableCell className='hidden sm:table-cell'>
-                                    <Badge
-                                        className='text-xs'
-                                        variant='secondary'
+                        {isLoading ? (
+                            <>
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                                    <TableRow
+                                        key={item}
+                                        className={cn([
+                                            item % 2 && "bg-accent",
+                                        ])}
                                     >
-                                        {order.orderStatus}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className='hidden md:table-cell'>
-                                    {order.createAt.split("T")[0]}
-                                </TableCell>
-                                <TableCell className='text-right'>
-                                    {order.totalPrice}
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                        <TableCell>
+                                            <Skeleton className='h-6 w-[150px]' />
+                                        </TableCell>
+                                        <TableCell className='hidden sm:table-cell'>
+                                            <Skeleton className='h-6 w-[150px]' />
+                                        </TableCell>
+                                        <TableCell className='hidden sm:table-cell'>
+                                            <Skeleton className='h-6 w-[100px]' />
+                                        </TableCell>
+                                        <TableCell className='hidden md:table-cell'>
+                                            <Skeleton className='h-6 w-[100px]' />
+                                        </TableCell>
+                                        <TableCell className='text-center'>
+                                            <Skeleton className='h-6 w-full' />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
+                        ) : (
+                            result?.orders?.map(
+                                (order: IOrder, index: number) => (
+                                    <TableRow
+                                        key={order._id}
+                                        className={cn([
+                                            index % 2 && "bg-accent",
+                                        ])}
+                                    >
+                                        <TableCell>
+                                            <div className='font-medium'>
+                                                {"Liam Doe"}
+                                            </div>
+                                            <div className='hidden text-sm text-muted-foreground md:inline'>
+                                                {"liam@gmail.com"}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className='hidden sm:table-cell text-center'>
+                                            Sale
+                                        </TableCell>
+                                        <TableCell className='hidden sm:table-cell text-center'>
+                                            <Badge
+                                                className='text-xs'
+                                                variant='secondary'
+                                            >
+                                                {order.orderStatus}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className='hidden md:table-cell text-center'>
+                                            {order.createAt.split("T")[0]}
+                                        </TableCell>
+                                        <TableCell className='text-center'>
+                                            Rs.{order.totalPrice.toFixed(2)}
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            )
+                        )}
                     </TableBody>
                 </Table>
             </CardContent>

@@ -16,7 +16,7 @@ export interface IProduct {
 
 export interface IOrder {
     user: string;
-
+    _id: string;
     paidAt: string;
     itemsPrice: number;
     taxPrice: number;
@@ -55,4 +55,19 @@ export interface IUser {
     createdAt: string;
     __v: number;
     token: string;
+}
+
+export interface IApiResponse<T> {
+    statusCode: number;
+    data: T;
+    message: string;
+    success: boolean;
+}
+
+interface ProfileState {
+    status: "idle" | "loading" | "authenticated";
+    loading: boolean;
+    user: IUser | null;
+    error: unknown;
+    access_token: string | null;
 }

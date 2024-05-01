@@ -10,7 +10,12 @@ import asyncHandler from "../utils/asyncHandler";
 declare global {
     namespace Express {
         interface Request {
-            user?: string;
+            user?: {
+                userId: string;
+                name: string;
+                email: string;
+                role: string;
+            };
         }
     }
 }
@@ -111,7 +116,7 @@ const handleRegister = asyncHandler(
 
 const handleProfile = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const user = await User.findById(req.user);
+        const user = await User.findById(req.user.userId);
         const access_token = user.generateAccessToken();
 
         const apiResponse = new ApiResponse(
@@ -120,6 +125,66 @@ const handleProfile = asyncHandler(
             "User profile retrieved successfully"
         );
         return res.status(200).json(apiResponse);
+    }
+);
+const handleProfileUpdate = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        let newUserData: {
+            name?: string;
+            email?: string;
+            avatar?: { public_id: string; url: string };
+        } = {
+            name: req.body.name,
+            email: req.body.email,
+        };
+
+        // if (req.body.avatar !== "") {
+        //     const user = await User.findById(req.user);
+        //     if (!user) {
+        //         return res.status(404).json({
+        //             success: false,
+        //             message: "User not found",
+        //         });
+        //     }
+
+        //     const imageId = user.avatar.public_id;
+        //     await cloudinary.v2.uploader.destroy(imageId);
+
+        //     const myCloud = await cloudinary.v2.uploader.upload(
+        //         req.body.avatar,
+        //         {
+        //             folder: "avatars",
+        //             width: 150,
+        //             crop: "scale",
+        //         }
+        //     );
+
+        //     newUserData.avatar = {
+        //         public_id: myCloud.public_id,
+        //         url: myCloud.secure_url,
+        //     };
+        // }
+        console.log(req.user);
+
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            newUserData,
+            {
+                new: true,
+                runValidators: true,
+                useFindAndModify: false,
+            }
+        );
+
+        if (!user) {
+            return next(new ApiError(404, "User not found."));
+        }
+
+        const apiResponse = new ApiResponse(
+            200,
+            "Profile Updated successfully."
+        );
+        res.status(apiResponse.statusCode).json(apiResponse);
     }
 );
 
@@ -219,14 +284,15 @@ const handleResetPassword = asyncHandler(
 const handleLogout = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const cookies = req.cookies;
-        if (!cookies?.jwt) return res.sendStatus(204); //No content
-        const refreshToken = cookies.jwt;
+        if (!cookies?.refresh_token) return res.sendStatus(204); //No content
+        const refreshToken = cookies.refresh_token;
 
         // Is refreshToken in db?
         const foundUser = User.findOneAndUpdate(
             { refreshToken },
             { refreshToken: null }
         );
+
         if (!foundUser) {
             res.clearCookie("jwt", {
                 httpOnly: true,
@@ -235,8 +301,17 @@ const handleLogout = asyncHandler(
             });
             return res.sendStatus(204);
         }
-
-        return new ApiResponse(200, null, "User Logged out successfully.");
+        res.clearCookie("jwt", {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        });
+        const apiResponse = new ApiResponse(
+            200,
+            null,
+            "User Logged out successfully."
+        );
+        return res.status(apiResponse.statusCode).json(apiResponse);
     }
 );
 export {
@@ -247,4 +322,5 @@ export {
     handleForgotPassword,
     handleResetPassword,
     handleLogout,
+    handleProfileUpdate,
 };

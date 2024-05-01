@@ -4,6 +4,7 @@ import {
     handleLogin,
     handleLogout,
     handleProfile,
+    handleProfileUpdate,
     handleRefreshToken,
     handleRegister,
     handleResetPassword,
@@ -18,6 +19,8 @@ router.post("/login", handleLogin);
 router.get("/me", [verifyJWT, handleProfile]);
 
 router.get("/refresh", handleRefreshToken);
+
+router.put("/me/update", [verifyJWT, handleProfileUpdate]);
 
 router.post("/forgot-password", handleForgotPassword);
 

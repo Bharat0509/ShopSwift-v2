@@ -1,4 +1,3 @@
-import { Axios } from "@/lib/utils";
 import {
     authFailure,
     authRequest,
@@ -6,8 +5,8 @@ import {
     selectAuthObject,
 } from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AxiosError } from "axios";
+
+import { useLoginMutation } from "@/redux/features/authApiSlice";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -23,6 +22,7 @@ import {
     FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
     firstName: z.string().min(2).max(50).optional(),
@@ -37,8 +37,10 @@ const Authentication = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    const [login, { isLoading }] = useLoginMutation();
 
-    const { loading, status, user } = useAppSelector(selectAuthObject);
+    const { status, user, loading } = useAppSelector(selectAuthObject);
+
     const [isRegister, setIsRegister] = useState<boolean>(false);
 
     const form = useForm<z.infer<typeof schema>>({
@@ -52,29 +54,19 @@ const Authentication = () => {
     const onSubmit: SubmitHandler<FormSchema> = async (userData) => {
         dispatch(authRequest());
         try {
-            const { data: result } = await Axios.post(
-                "/api/v1/login",
-                userData
-            );
-            dispatch(authSuccess(result.data));
+            const result = await login(userData).unwrap();
+            console.log(result);
+
+            dispatch(authSuccess(result?.data));
         } catch (e: unknown) {
-            if (e instanceof AxiosError) {
-                dispatch(authFailure(e?.message));
-                toast.error(e?.message);
-            } else {
-                console.error("Unexpected error:", e);
-
-                dispatch(authFailure("An unexpected error occurred"));
-
-                toast.error(
-                    "An unexpected error occurred. Please try again later."
-                );
-            }
+            const errorMsg = (e as Error)?.message ?? "Something went wrong.";
+            toast.error(errorMsg);
+            dispatch(authFailure(errorMsg));
         }
     };
     useEffect(() => {
         if (!loading && status === "authenticated" && user?.email) {
-            const redirectUrl = "/account";
+            const redirectUrl = location?.state?.redirectUrl ?? "/account";
             navigate(redirectUrl, { replace: true });
         }
     }, [loading, location.state, navigate, status, user?.email]);
@@ -186,7 +178,7 @@ const Authentication = () => {
                                 <Button
                                     type='submit'
                                     className='w-full'
-                                    disabled={loading}
+                                    disabled={isLoading}
                                 >
                                     {isRegister ? "Sign Up" : "Login"}
                                 </Button>

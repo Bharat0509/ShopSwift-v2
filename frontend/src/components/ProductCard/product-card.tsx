@@ -24,7 +24,7 @@ export function ProductCard({
                     alt='Product Image'
                     className='rounded-t-lg object-cover aspect-square'
                     height={height}
-                    src={product.images[0].url ?? "/placeholder.svg"}
+                    src={product?.images?.[0]?.url ?? "/placeholder.svg"}
                     width={width}
                 />
             </CardHeader>

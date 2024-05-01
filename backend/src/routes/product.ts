@@ -26,7 +26,7 @@ router.route("/product/:id").get(getProductDetails);
 router.route("/products/new").post(createProduct);
 
 router
-    .route("/admin/product/new")
+    .route("/admin/products/add")
     .post([verifyJWT, authorizeRoles("admin"), createProduct]);
 
 router.route("/product/:id").put(updateProduct);

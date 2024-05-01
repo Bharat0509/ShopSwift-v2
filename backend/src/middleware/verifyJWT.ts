@@ -6,17 +6,28 @@ import ApiError from "../utils/ApiError";
 declare global {
     namespace Express {
         interface Request {
-            user?: string;
+            user?: {
+                userId: string;
+                name: string;
+                email: string;
+                role: string;
+            };
         }
     }
 }
-
 const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers["authorization"];
 
-    if (!authHeader) return next(new ApiError(403, "Unauthorized Access"));
+    if (!authHeader)
+        return next(
+            new ApiError(403, "Access Token Expired.Please Login Again")
+        );
 
     const token = authHeader.split(" ")[1];
+    if (!token)
+        return next(
+            new ApiError(403, "Access Token Expired.Please Login Again")
+        );
 
     jwt.verify(
         token,
@@ -24,11 +35,12 @@ const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
         (err: VerifyErrors | null, decoded: any) => {
             if (err) {
                 return next(
-                    new ApiError(403, `${err.message} : ${err.message}`)
+                    new ApiError(403, "Access Token Expired.Please Login Again")
                 );
             }
+
             // Store decoded user information in the user property of the Request object
-            req.user = decoded.userId;
+            req.user = decoded;
             next();
         }
     );

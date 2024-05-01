@@ -2,12 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 
 import { navMenuItems } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { selectAuthUser } from "@/redux/features/authSlice";
 import { useAppSelector } from "@/redux/hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { selectAuthObject } from "@/redux/features/authSlice";
 
 export function AccountLayout({ children }: { children: React.ReactNode }) {
-    const { user } = useAppSelector(selectAuthObject);
+    const user = useAppSelector(selectAuthUser);
     const location = useLocation();
 
     return (
