@@ -3,6 +3,7 @@ import { CorsOptions } from "cors";
 export const whitelist: string[] = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
+    "https://shop-swift-v2.vercel.app"
 ];
 
 const corsOptions: CorsOptions = {
