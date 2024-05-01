@@ -10,10 +10,10 @@ import { sendWelcomeEmail } from "../emailTemplates";
 
 export const emailQueue = new Queue("email-Q", {
     connection: {
-        host: "redis-1b116726-bhartbhammar3336-28e2.h.aivencloud.com",
-        port: 16393,
-        username: "default",
-        password: "AVNS_7m2CBEJrsIdw3xsEq8X",
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT as number,
+        username: process.env.REDIS_USERNAME,
+        password: process.env.REDIS_PASSWORD,
     },
 });
 
