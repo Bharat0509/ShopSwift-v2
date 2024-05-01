@@ -9,7 +9,7 @@ import { authSuccess, logOut } from "../features/authSlice";
 import { RootState } from "../store";
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: import.meta.env.BACKEND_API_BASE_URL ?? "http://localhost:4000",
+    baseUrl: "https://shopswift-v2.onrender.com",
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const state = getState() as RootState;
