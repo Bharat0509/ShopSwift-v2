@@ -51,7 +51,7 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function Profile() {
-    const { user, access_token } = useAppSelector(selectAuthObject);
+    const { user } = useAppSelector(selectAuthObject);
 
     const defaultValues: Partial<ProfileFormValues> = {
         name: user?.name ?? "user",
@@ -65,6 +65,8 @@ export default function Profile() {
     });
 
     async function onSubmit(profileData: ProfileFormValues) {
+        console.log(profileData);
+
         // const profileUpdateToastId = toast.loading("Updating Profile...", {
         //     duration: 5000,
         // });

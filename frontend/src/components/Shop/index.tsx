@@ -2,10 +2,13 @@ import { Filter, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
+import { ProductCard } from "../ProductCard/product-card";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -26,13 +29,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
-import { ProductCard } from "../ProductCard/product-card";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { useEffect } from "react";
-import {
-    fetchAppProducts,
-    fetchDashboardProducts,
-} from "@/redux/features/appSlice";
 
 const categories = [
     {
@@ -91,7 +87,7 @@ export function Shop() {
     }
     useEffect(() => {
         if (!products?.length) {
-            dispatch(fetchAppProducts());
+            // dispatch(fetchAppProducts());
         }
     }, [dispatch, products?.length]);
     return (

@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/table";
 import { IProduct } from "@/lib/typing";
 import { useGetAdminProductsQuery } from "@/redux/features/dashboardApiSlice";
-import { fetchDashboardProducts } from "@/redux/features/dashboardSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -45,7 +44,7 @@ export default function ProductsDashboard() {
     const { data, isLoading } = useGetAdminProductsQuery("dashboard-orders");
 
     useEffect(() => {
-        dispatch(fetchDashboardProducts());
+        // dispatch(fetchDashboardProducts());
     }, [dispatch]);
 
     return (
