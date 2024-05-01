@@ -11,7 +11,7 @@ import { sendWelcomeEmail } from "../emailTemplates";
 export const emailQueue = new Queue("email-Q", {
     connection: {
         host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT as number,
+        port: parseInt(process.env.REDIS_PORT),
         username: process.env.REDIS_USERNAME,
         password: process.env.REDIS_PASSWORD,
     },
