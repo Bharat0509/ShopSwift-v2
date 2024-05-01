@@ -8,15 +8,6 @@ import asyncHandler from "../utils/asyncHandler";
 import { Queue } from "bullmq";
 import { sendWelcomeEmail } from "../emailTemplates";
 
-export const emailQueue = new Queue("email-Q", {
-    connection: {
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT),
-        username: process.env.REDIS_USERNAME,
-        password: process.env.REDIS_PASSWORD,
-    },
-});
-
 // Define a custom property on the Request object to store decoded user information
 declare global {
     namespace Express {

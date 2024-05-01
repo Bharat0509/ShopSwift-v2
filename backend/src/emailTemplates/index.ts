@@ -1,4 +1,4 @@
-import { emailQueue } from "../controllers/user";
+// import { emailQueue } from "../controllers/user";
 
 export const sendWelcomeEmail = async () => {
     const emailHTML = `
@@ -36,10 +36,10 @@ export const sendWelcomeEmail = async () => {
 
       </html>`;
 
-    await emailQueue.add(`send-welcome-email-${Date.now()}`, {
-        from: "shopswift.noreply@noreply.com",
-        to: "hardcorewiles@tomorjerry.com",
-        subject: "Welcome to ShopSwift ",
-        html: emailHTML,
-    });
+    // await emailQueue.add(`send-welcome-email-${Date.now()}`, {
+    //     from: "shopswift.noreply@noreply.com",
+    //     to: "hardcorewiles@tomorjerry.com",
+    //     subject: "Welcome to ShopSwift ",
+    //     html: emailHTML,
+    // });
 };
