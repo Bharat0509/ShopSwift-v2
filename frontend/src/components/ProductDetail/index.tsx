@@ -14,30 +14,31 @@ import { IProduct } from "@/lib/typing";
 import { useGetProductsByIdQuery } from "@/redux/features/appApiSlice";
 import { StarIcon } from "lucide-react";
 import { useParams } from "react-router-dom";
+import { Skeleton } from "../ui/skeleton";
 
 export default function ProductInfo() {
     const param = useParams();
 
-    const { isSuccess, data } = useGetProductsByIdQuery({
+    const { isLoading, data } = useGetProductsByIdQuery({
         productId: param.productId,
     });
-    const product: IProduct = data.product;
+    const product: IProduct = data?.product;
     return (
         <>
             <div className='grid md:grid-cols-2 gap-6 lg:gap-12 items-start container px-4 mx-auto py-6'>
                 <div className='grid gap-4'>
                     <div className='grid md:grid-cols-5 gap-3 items-start'>
                         <div className='hidden md:flex flex-col gap-3 items-start'>
-                            {product.images.map((img) => (
+                            {product?.images?.map((img) => (
                                 <button
-                                    key={img.url}
+                                    key={img?.url}
                                     className='border hover:border-gray-900 rounded-lg overflow-hidden transition-colors dark:hover:border-gray-50'
                                 >
                                     <img
                                         alt='Preview thumbnail'
                                         className='aspect-[5/6]  object-cover'
                                         height='120'
-                                        src={img.url}
+                                        src={img?.url}
                                         width='100'
                                     />
                                     <span className='sr-only'>
@@ -47,21 +48,40 @@ export default function ProductInfo() {
                             ))}
                         </div>
                         <div className='md:col-span-4'>
-                            <img
-                                alt='Product Image'
-                                className='aspect-[2/3] h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
-                                height='400'
-                                src={product.images[0].url}
-                                width='600'
-                            />
+                            {isLoading ? (
+                                <>
+                                    <img
+                                        alt='Product Image'
+                                        className='aspect-[2/3] animate-pulse h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
+                                        height='400'
+                                        src='/placeholder.svg'
+                                        width='600'
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <img
+                                        alt='Product Image'
+                                        className='aspect-[2/3] h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
+                                        height='400'
+                                        src={product?.images[0]?.url}
+                                        width='600'
+                                    />
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
                 <div className='grid gap-4 md:gap-10 items-start'>
                     <div className='grid gap-4'>
-                        <h1 className='font-bold text-3xl lg:text-4xl'>
-                            {isSuccess && data.product.name}
-                        </h1>
+                        {!isLoading ? (
+                            <Skeleton className='h-8 w-3/4' />
+                        ) : (
+                            <h1 className='font-bold text-3xl lg:text-4xl'>
+                                data.product.name
+                            </h1>
+                        )}
+
                         <div>
                             <p>
                                 60% combed ringspun cotton/40% polyester jersey
@@ -76,13 +96,17 @@ export default function ProductInfo() {
                                 <StarIcon className='w-5 h-5 fill-muted stroke-muted-foreground' />
                                 <StarIcon className='w-5 h-5 fill-muted stroke-muted-foreground' />
                             </div>
-                            <div className='text-sm text-gray-500 dark:text-gray-400'>
-                                {product.ratings} ({product.numOfReviews}{" "}
-                                reviews)
-                            </div>
+                            {!isLoading ? (
+                                <Skeleton className='h-8 w-3/4' />
+                            ) : (
+                                <div className='text-sm text-gray-500 dark:text-gray-400'>
+                                    {product?.ratings} ({product?.numOfReviews}{" "}
+                                    reviews)
+                                </div>
+                            )}
                         </div>
                         <div className='text-4xl font-bold'>
-                            ${product.price}
+                            {!isLoading && `$${product.price}`}
                         </div>
                     </div>
                     <form className='grid gap-4 md:gap-10'>
