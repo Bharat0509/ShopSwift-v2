@@ -10,8 +10,6 @@ const errorHandlerMiddleware = (
     let statusCode: number = err.statusCode || 500;
     let message: string = err.message || "Internal Server Error";
 
-    console.log(err.name);
-
     // Default error handling
     if (err instanceof ApiError) {
         statusCode = err.statusCode || 500;

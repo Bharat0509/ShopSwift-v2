@@ -1,9 +1,9 @@
 // dashboardSlice.ts
-import { IOrder, IProduct } from "@/lib/typing";
+import { ICart, IOrder, IProduct } from "@/lib/typing";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-interface DashboardState {
+interface appState {
     loading: boolean;
     products: IProduct[] | null;
     product: IProduct | null;
@@ -12,9 +12,10 @@ interface DashboardState {
     customers: IProduct | null;
     customer: IProduct[] | null;
     error: unknown;
+    cart: ICart;
 }
 
-const initialState: DashboardState = {
+const initialState: appState = {
     loading: false,
     products: null,
     customers: null,
@@ -23,91 +24,52 @@ const initialState: DashboardState = {
     order: null,
     customer: null,
     error: null,
+    cart: {
+        items: [],
+        totalItems: 0,
+        totalPrice: 0,
+    },
 };
 
 const appSlice = createSlice({
     name: "app",
     initialState,
-    reducers: {},
-    // extraReducers: (builder) => {
-    //     builder
-    //         .addCase(fetchAppProducts.pending, (state) => {
-    //             state.loading = true;
-    //             state.error = null;
-    //         })
-    //         .addCase(fetchAppOrders.pending, (state) => {
-    //             state.loading = true;
-    //             state.error = null;
-    //         })
-    //         .addCase(
-    //             fetchAppProducts.fulfilled,
-    //             (state, action: PayloadAction<IProduct[]>) => {
-    //                 state.loading = false;
-    //                 state.products = action.payload;
-    //             }
-    //         )
-    //         .addCase(
-    //             fetchAppOrders.fulfilled,
-    //             (state, action: PayloadAction<IOrder[]>) => {
-    //                 state.loading = false;
-    //                 state.orders = action.payload;
-    //             }
-    //         )
-    //         .addCase(fetchAppProducts.rejected, (state, action) => {
-    //             state.loading = false;
-    //             state.error =
-    //                 action?.error?.message ??
-    //                 "Failed to fetch dashboard products";
-    //         })
-    //         .addCase(fetchAppOrders.rejected, (state, action) => {
-    //             state.loading = false;
-    //             state.error =
-    //                 action?.error?.message ??
-    //                 "Failed to fetch dashboard products";
-    //         });
-    // },
+    reducers: {
+        addToCart(state, action) {
+            // Add item to cart
+            const newItem = action.payload;
+            console.log(newItem);
+
+            state.cart.items.push(newItem);
+        },
+        removeFromCart(state, action) {
+            // Remove item from cart
+            const productIdToRemove = action.payload;
+            state.cart.items = state.cart.items.filter(
+                (item) => item.productId !== productIdToRemove
+            );
+        },
+        updateCartItemQuantity(state, action) {
+            // Update quantity of an item in the cart
+            const { productId, quantity } = action.payload;
+            const itemToUpdate = state.cart.items.find(
+                (item) => item.productId === productId
+            );
+            if (itemToUpdate) {
+                itemToUpdate.quantity = quantity;
+            }
+        },
+        clearCart(state) {
+            // Clear the entire cart
+            state.cart = [];
+        },
+    },
 });
 
-// Define the async thunk to fetch dashboard products
-// export const fetchAppProducts = createAsyncThunk(
-//     "dashboard/fetchAppProducts",
-//     async (_, { getState }) => {
-//         try {
-//             const state = getState() as RootState;
-//             const axiosOptions: AxiosRequestConfig = {
-//                 headers: {
-//                     Authorization: `Bearer ${state.auth.access_token}`,
-//                 },
-//             };
-//             const response = await Axios.get("/api/v1/products", axiosOptions);
-//             return response.data.products as IProduct[];
-//         } catch (error) {
-//             throw new Error("Failed to fetch dashboard products");
-//         }
-//     }
-// );
-
-// // Define the async thunk to fetch dashboard orders
-// export const fetchAppOrders = createAsyncThunk(
-//     "dashboard/fetchAppOrders",
-//     async (_, { getState }) => {
-//         const state = getState() as RootState;
-//         const axiosOptions: AxiosRequestConfig = {
-//             headers: {
-//                 Authorization: `Bearer ${state.auth.access_token}`,
-//             },
-//         };
-//         try {
-//             const { data: result } = await Axios.get(
-//                 "/api/v1/orders/me",
-//                 axiosOptions
-//             );
-//             return result.data.orders as IOrder[];
-//         } catch (error) {
-//             throw new Error("Failed to fetch dashboard orders");
-//         }
-//     }
-// );
 export const selectAppOrders = (state: RootState) => state.app.orders;
 export const selectAppProducts = (state: RootState) => state.app.products;
+
+export const { addToCart, removeFromCart, updateCartItemQuantity, clearCart } =
+    appSlice.actions;
+
 export default appSlice.reducer;

@@ -168,7 +168,6 @@ const handleProfileUpdate = asyncHandler(
         //         url: myCloud.secure_url,
         //     };
         // }
-        console.log(req.user);
 
         const user = await User.findByIdAndUpdate(
             req.user.userId,

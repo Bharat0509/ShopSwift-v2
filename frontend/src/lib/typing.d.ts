@@ -26,6 +26,19 @@ export interface IOrder {
     createAt: string;
 }
 
+export interface ICartItem {
+    productId: string;
+    name: string;
+    images: IImage[];
+    quantity: number;
+}
+
+export interface ICart {
+    items: ICartItem[];
+    totalItems: number;
+    totalPrice: number;
+}
+
 export interface IImage {
     _id: string;
     public_id: string;

@@ -38,7 +38,6 @@ const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
                     new ApiError(403, "Access Token Expired.Please Login Again")
                 );
             }
-
             // Store decoded user information in the user property of the Request object
             req.user = decoded;
             next();

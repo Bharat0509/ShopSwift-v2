@@ -35,17 +35,10 @@ import {
 } from "@/components/ui/table";
 import { IProduct } from "@/lib/typing";
 import { useGetAdminProductsQuery } from "@/redux/features/dashboardApiSlice";
-import { useAppDispatch } from "@/redux/hooks";
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function ProductsDashboard() {
-    const dispatch = useAppDispatch();
     const { data, isLoading } = useGetAdminProductsQuery("dashboard-orders");
-
-    useEffect(() => {
-        // dispatch(fetchDashboardProducts());
-    }, [dispatch]);
 
     return (
         <Card>
@@ -150,7 +143,7 @@ export default function ProductsDashboard() {
                                             className='aspect-square rounded-md object-cover'
                                             height='64'
                                             src={
-                                                product.images[0].url ??
+                                                product?.images[0]?.url ??
                                                 "/placeholder.svg"
                                             }
                                             width='64'
@@ -160,7 +153,9 @@ export default function ProductsDashboard() {
                                         {product.name}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant='outline'>Draft</Badge>
+                                        <Badge variant='outline'>
+                                            Published
+                                        </Badge>
                                     </TableCell>
                                     <TableCell>${product.price}</TableCell>
                                     <TableCell className='hidden md:table-cell'>
@@ -199,7 +194,7 @@ export default function ProductsDashboard() {
                                                 <DropdownMenuItem>
                                                     <Link
                                                         className='w-full flex items-center gap-2'
-                                                        to={`/products/${product._id}/delete`}
+                                                        to={`/products/${product?._id}/delete`}
                                                     >
                                                         <Trash2 size={16} />{" "}
                                                         Delete

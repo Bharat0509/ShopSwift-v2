@@ -30,6 +30,8 @@ import { Pencil } from "lucide-react";
 // import { toast } from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { selectAuthObject } from "@/redux/features/authSlice";
+import { useUpdateProfileMutation } from "@/redux/features/authApiSlice";
+import { toast } from "react-hot-toast";
 
 const profileFormSchema = z.object({
     name: z
@@ -53,6 +55,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export default function Profile() {
     const { user } = useAppSelector(selectAuthObject);
 
+    const [updateProfile] = useUpdateProfileMutation();
     const defaultValues: Partial<ProfileFormValues> = {
         name: user?.name ?? "user",
         email: user?.email ?? "user@gmail.com",
@@ -65,27 +68,19 @@ export default function Profile() {
     });
 
     async function onSubmit(profileData: ProfileFormValues) {
-        console.log(profileData);
+        const profileUpdateToastId = toast.loading("Updating Profile...", {
+            duration: 5000,
+        });
 
-        // const profileUpdateToastId = toast.loading("Updating Profile...", {
-        //     duration: 5000,
-        // });
-        // try {
-        //     await Axios.put("/api/v1/me/update", profileData, {
-        //         headers: {
-        //             Authorization: `Bearer ${access_token}`,
-        //         },
-        //     });
-        //     toast.success("Profile Updated !", { id: profileUpdateToastId });
-        // } catch (e: unknown) {
-        //     let error: string = "Something went wrong. please try again";
-        //     if (e instanceof AxiosError) {
-        //         error = e?.response?.data?.error;
-        //     } else {
-        //         error = "An unexpected error occurred. Please try again later.";
-        //     }
-        //     toast.error(error, { id: profileUpdateToastId });
-        // }
+        try {
+            await updateProfile(profileData);
+            toast.success("Profile Updated !", { id: profileUpdateToastId });
+        } catch (error) {
+            toast.error(
+                "An unexpected error occurred. Please try again later.",
+                { id: profileUpdateToastId }
+            );
+        }
     }
 
     const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
