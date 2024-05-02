@@ -16,6 +16,8 @@ import { AddProduct } from "./components/Dashboard/Products/Add";
 import { Shop } from "./components/Shop";
 import LogOut from "./components/LogOut";
 import ProductInfo from "./components/ProductDetail";
+import { ForgotPassword } from "./components/Authentication/ForgotPassword";
+import { ResetPassword } from "./components/Authentication/ResetPassword";
 
 function App() {
     return (
@@ -25,6 +27,11 @@ function App() {
                 <Routes>
                     <Route path='/' index element={<Home />} />
                     <Route path='/auth' element={<Authentication />} />
+                    <Route
+                        path='/forgot-password'
+                        element={<ForgotPassword />}
+                    />
+                    <Route path='/reset-password' element={<ResetPassword />} />
                     <Route path='/logOut' element={<LogOut />} />
                     <Route path='/products' element={<Shop />} />
                     <Route

@@ -38,7 +38,6 @@ const appSlice = createSlice({
         addToCart(state, action) {
             // Add item to cart
             const newItem = action.payload;
-            console.log(newItem);
 
             state.cart.items.push(newItem);
         },
@@ -68,8 +67,7 @@ const appSlice = createSlice({
     },
 });
 
-export const selectAppOrders = (state: RootState) => state.app.orders;
-export const selectAppProducts = (state: RootState) => state.app.products;
+export const selectCart = (state: RootState) => state.app.cart;
 
 export const { addToCart, removeFromCart, updateCartItemQuantity, clearCart } =
     appSlice.actions;

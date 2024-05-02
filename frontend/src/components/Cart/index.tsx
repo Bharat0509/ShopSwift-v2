@@ -24,8 +24,12 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Separator } from "../ui/separator";
+import { useAppSelector } from "@/redux/hooks";
+import { selectCart } from "@/redux/features/appSlice";
+import { ICartItem } from "@/lib/typing";
 
 export default function Cart() {
+    const { items, totalItems, totalPrice } = useAppSelector(selectCart);
     return (
         <Card>
             <CardHeader>
@@ -35,7 +39,7 @@ export default function Cart() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className='lg:flex gap-4'>
+                <div className='lg:flex gap-4 w-full'>
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -57,98 +61,122 @@ export default function Cart() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow>
-                                <TableCell className='hidden sm:table-cell'>
-                                    <img
-                                        alt='Product img'
-                                        className='aspect-square rounded-md object-cover'
-                                        height='64'
-                                        src='/placeholder.svg'
-                                        width='64'
-                                    />
-                                </TableCell>
-                                <TableCell className='font-medium'>
-                                    Laser Lemonade Machine
-                                </TableCell>
+                            {items.length > 0 ? (
+                                items.map((item: ICartItem) => (
+                                    <TableRow key={item.productId}>
+                                        <TableCell className='hidden sm:table-cell'>
+                                            <img
+                                                alt='Product img'
+                                                className='aspect-square rounded-md object-cover'
+                                                height='64'
+                                                src={
+                                                    item.images[0].url ??
+                                                    "/placeholder.svg"
+                                                }
+                                                width='64'
+                                            />
+                                        </TableCell>
+                                        <TableCell className='font-medium'>
+                                            {item.name}
+                                        </TableCell>
 
-                                <TableCell>$499.99</TableCell>
-                                <TableCell className='hidden md:table-cell'>
-                                    2
-                                </TableCell>
-                                <TableCell className='hidden md:table-cell'>
-                                    $999.98
-                                </TableCell>
-                                <TableCell>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-haspopup='true'
-                                                size='icon'
-                                                variant='ghost'
-                                            >
-                                                <MoreHorizontal className='h-4 w-4' />
-                                                <span className='sr-only'>
-                                                    Toggle menu
-                                                </span>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align='end'>
-                                            <DropdownMenuLabel>
-                                                Actions
-                                            </DropdownMenuLabel>
-                                            <DropdownMenuItem>
-                                                Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem>
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
+                                        <TableCell>$499.9</TableCell>
+                                        <TableCell className='hidden md:table-cell'>
+                                            {item.quantity}
+                                        </TableCell>
+                                        <TableCell className='hidden md:table-cell'>
+                                            $999.98
+                                        </TableCell>
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        aria-haspopup='true'
+                                                        size='icon'
+                                                        variant='ghost'
+                                                    >
+                                                        <MoreHorizontal className='h-4 w-4' />
+                                                        <span className='sr-only'>
+                                                            Toggle menu
+                                                        </span>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align='end'>
+                                                    <DropdownMenuLabel>
+                                                        Actions
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuItem>
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem>
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow className='text-center w-full '>
+                                    <TableCell className='w-full '>
+                                        <h3 className='text-2xl font-bold tracking-tight '>
+                                            You have no products
+                                        </h3>
+                                        <p className='text-sm text-muted-foreground'>
+                                            You can start selling as soon as you
+                                            add a product.
+                                        </p>
+                                        <Button className='mt-4'>
+                                            Add Product
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
 
-                    <Card className='overflow-hidden mt-4 lg:mt-0 lg:w-96'>
-                        <CardContent className='p-6 text-sm'>
-                            <div className='grid gap-3'>
-                                <div className='font-semibold'>
-                                    Order Summary
-                                </div>
+                    {totalItems > 0 && (
+                        <Card className='overflow-hidden mt-4 lg:mt-0 lg:w-96'>
+                            <CardContent className='p-6 text-sm'>
+                                <div className='grid gap-3'>
+                                    <div className='font-semibold'>
+                                        Order Summary
+                                    </div>
 
-                                <Separator className='my-2' />
-                                <ul className='grid gap-3'>
-                                    <li className='flex items-center justify-between'>
-                                        <span className='text-muted-foreground'>
-                                            Subtotal
-                                        </span>
-                                        <span>$299.00</span>
-                                    </li>
-                                    <li className='flex items-center justify-between'>
-                                        <span className='text-muted-foreground'>
-                                            Shipping
-                                        </span>
-                                        <span>$5.00</span>
-                                    </li>
-                                    <li className='flex items-center justify-between'>
-                                        <span className='text-muted-foreground'>
-                                            Tax
-                                        </span>
-                                        <span>$25.00</span>
-                                    </li>
-                                    <li className='flex items-center justify-between font-semibold'>
-                                        <span className='text-muted-foreground'>
-                                            Total
-                                        </span>
-                                        <span>$329.00</span>
-                                    </li>
-                                </ul>
-                                <Button className='rounded-sm'>
-                                    Continue for Payment
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    <Separator className='my-2' />
+                                    <ul className='grid gap-3'>
+                                        <li className='flex items-center justify-between'>
+                                            <span className='text-muted-foreground'>
+                                                Subtotal
+                                            </span>
+                                            <span>${totalPrice}</span>
+                                        </li>
+                                        <li className='flex items-center justify-between'>
+                                            <span className='text-muted-foreground'>
+                                                Shipping
+                                            </span>
+                                            <span>$5.00</span>
+                                        </li>
+                                        <li className='flex items-center justify-between'>
+                                            <span className='text-muted-foreground'>
+                                                Tax
+                                            </span>
+                                            <span>$25.00</span>
+                                        </li>
+                                        <li className='flex items-center justify-between font-semibold'>
+                                            <span className='text-muted-foreground'>
+                                                Total
+                                            </span>
+                                            <span>${totalPrice + 30}</span>
+                                        </li>
+                                    </ul>
+                                    <Button className='rounded-sm'>
+                                        Continue for Payment
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </CardContent>
         </Card>

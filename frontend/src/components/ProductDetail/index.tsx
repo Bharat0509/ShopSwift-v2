@@ -10,7 +10,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { IProduct } from "@/lib/typing";
+import { ICartItem, IProduct } from "@/lib/typing";
 import { cn } from "@/lib/utils";
 import { useGetProductsByIdQuery } from "@/redux/features/appApiSlice";
 import { addToCart } from "@/redux/features/appSlice";
@@ -36,14 +36,22 @@ export default function ProductInfo() {
     const { isLoading, data, isError } = useGetProductsByIdQuery({
         productId: param.productId,
     });
-
+    const [productCartQty, setProductCartQty] = useState<number>(1);
+    const product: IProduct = data?.product;
     const handleAddToCart = (e: React.FormEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        const productId = param.productId;
-        dispatch(addToCart({ productId, quantity: 1 }));
+
+        const productToAdd: ICartItem = {
+            productId: param.productId as string,
+            name: product?.name as string,
+            images: product.images,
+            price: product.price,
+            quantity: productCartQty,
+        };
+
+        dispatch(addToCart(productToAdd));
         toast.success("Item added to cart!");
     };
-    const product: IProduct = data?.product;
     return (
         <>
             <main>
@@ -263,7 +271,6 @@ export default function ProductInfo() {
                                                     value='s'
                                                 />
                                                 S
-                                                {"\n                          "}
                                             </Label>
                                             <Label
                                                 className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
@@ -274,7 +281,6 @@ export default function ProductInfo() {
                                                     value='m'
                                                 />
                                                 M
-                                                {"\n                          "}
                                             </Label>
                                             <Label
                                                 className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
@@ -285,7 +291,6 @@ export default function ProductInfo() {
                                                     value='l'
                                                 />
                                                 L
-                                                {"\n                          "}
                                             </Label>
                                             <Label
                                                 className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
@@ -313,7 +318,14 @@ export default function ProductInfo() {
                                         >
                                             Quantity
                                         </Label>
-                                        <Select defaultValue='1'>
+                                        <Select
+                                            defaultValue='1'
+                                            onValueChange={(value: string) =>
+                                                setProductCartQty(
+                                                    parseInt(value)
+                                                )
+                                            }
+                                        >
                                             <SelectTrigger className='w-24'>
                                                 <SelectValue placeholder='Select' />
                                             </SelectTrigger>

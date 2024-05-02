@@ -6,7 +6,7 @@ import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
 import { Queue } from "bullmq";
-import { sendWelcomeEmail } from "../emailTemplates";
+import { sendForgotPasswordEmail, sendWelcomeEmail } from "../emailTemplates";
 
 // Define a custom property on the Request object to store decoded user information
 declare global {
@@ -251,12 +251,16 @@ const handleForgotPassword = asyncHandler(
         await user.save({ validateBeforeSave: false });
 
         // Construct reset password URL
+
         const resetPasswordUrl = `${req.protocol}://${req.get(
             "host"
-        )}/password/reset/${resetToken}`;
+        )}/reset-password?token=${resetToken}`;
 
-        // Construct email message
-        const message = `Your password reset token is:\n\n${resetPasswordUrl}\n\nIf you have not requested this email, please ignore it.`;
+        await sendForgotPasswordEmail(
+            resetPasswordUrl,
+            user.name,
+            req.body.email
+        );
 
         const apiResponse = new ApiResponse(
             200,
@@ -269,16 +273,24 @@ const handleForgotPassword = asyncHandler(
 
 const handleResetPassword = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const user = await User.findOne({ email: req.body.email });
+        console.log(req.body);
+
+        const user = await User.findOne({ resetPasswordToken: req.body.token });
+        console.log(user);
+
+        const currDate = new Date(Date.now());
         if (!user) {
             const apiError = new ApiError(404, "User Not Found");
             return next(apiError);
         }
-
+        user.password = req.body.password;
+        (user.resetPasswordExpires = null),
+            (user.resetPasswordToken = null),
+            user.save();
         const apiResponse = new ApiResponse(
             200,
             null,
-            `Email sent to ${user.email} successfully`
+            `Password reset successful.`
         );
         res.status(apiResponse.statusCode).json(apiResponse);
     }

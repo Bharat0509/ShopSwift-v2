@@ -27,17 +27,20 @@ import {
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useEffect } from "react";
+import { Badge } from "../ui/badge";
+import { selectCart } from "@/redux/features/appSlice";
 
 const Navbar = () => {
     const { setTheme } = useTheme();
     const { user, status } = useAppSelector(selectAuthObject);
+    const { totalItems } = useAppSelector(selectCart);
     const dispatch = useAppDispatch();
     const { isSuccess, data: result } = useMeQuery("user");
     useEffect(() => {
         if (isSuccess) {
             dispatch(authSuccess(result?.data));
         }
-    }, [dispatch, isSuccess, result?.data]);
+    }, [dispatch, isSuccess, result?.data, totalItems]);
 
     return (
         <header className='sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50'>
@@ -164,10 +167,18 @@ const Navbar = () => {
                     <Button
                         variant='outline'
                         size='icon'
-                        className='rounded-full'
+                        className='rounded-full relative'
                     >
                         <ShoppingCart className='h-5 w-5' />
                         <span className='sr-only'>shopping cart menu</span>
+                        {totalItems > 0 && (
+                            <Badge
+                                className='rounded-full flex items-center justify-center w-4 h-5 top-0 -right-1 absolute'
+                                variant='default'
+                            >
+                                {totalItems}
+                            </Badge>
+                        )}
                     </Button>
                 </Link>
 

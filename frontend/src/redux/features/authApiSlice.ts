@@ -16,6 +16,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 body: { ...profileData },
             }),
         }),
+        sendForgotPasswordEmail: builder.mutation({
+            query: (email) => ({
+                url: "/api/v1/forgot-password",
+                method: "POST",
+                body: { email },
+            }),
+        }),
+        resetPassword: builder.mutation({
+            query: ({ password, token }) => ({
+                url: "/api/v1/reset-password",
+                method: "PUT",
+                body: { password, token },
+            }),
+        }),
         me: builder.query({
             query: () => ({
                 url: "/api/v1/me",
@@ -25,5 +39,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
 });
 
-export const { useLoginMutation, useMeQuery, useUpdateProfileMutation } =
-    authApiSlice;
+export const {
+    useLoginMutation,
+    useMeQuery,
+    useUpdateProfileMutation,
+    useSendForgotPasswordEmailMutation,
+    useResetPasswordMutation,
+} = authApiSlice;

@@ -29,24 +29,26 @@ export default function HomeCarousel() {
                 <CarouselContent>
                     {bannerContent.map((banner) => (
                         <CarouselItem key={banner.title}>
-                            <div className='relative w-full h-[300px] md:h-[350px] lg:h-[400px] overflow-hidden'>
+                            <div className='relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden'>
                                 <img
                                     alt='Banner 1'
                                     className='w-full h-full object-cover'
                                     height={1080}
-                                    src='/placeholder.svg'
+                                    src={
+                                        banner.bannerImage ?? "/placeholder.svg"
+                                    }
                                     style={{
-                                        aspectRatio: "1920/1080",
+                                        aspectRatio: "1920/1280",
                                         objectFit: "cover",
                                     }}
                                     width={1920}
                                 />
                                 <div className='absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent' />
                                 <div className='absolute inset-0 flex flex-col items-center justify-center px-4 text-center space-y-6 md:space-y-8 text-secondary-foreground/75'>
-                                    <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight dark:text-primary/75'>
+                                    <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight dark:text-primary/60'>
                                         {banner.title}
                                     </h1>
-                                    <p className='text-lg md:text-xl lg:text-2xl max-w-[800px] line-clamp-2 dark:text-secondary'>
+                                    <p className='text-lg md:text-xl lg:text-2xl max-w-[800px] line-clamp-2 dark:text-secondary-foreground'>
                                         {banner.description}
                                     </p>
                                     <div className='flex gap-4'>

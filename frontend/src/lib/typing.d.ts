@@ -30,6 +30,7 @@ export interface ICartItem {
     productId: string;
     name: string;
     images: IImage[];
+    price: number;
     quantity: number;
 }
 
