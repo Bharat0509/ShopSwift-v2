@@ -38,15 +38,24 @@ const appSlice = createSlice({
         addToCart(state, action) {
             // Add item to cart
             const newItem = action.payload;
-
+            state.cart.totalItems += newItem.quantity;
+            state.cart.totalPrice += newItem.quantity * newItem.price;
             state.cart.items.push(newItem);
         },
         removeFromCart(state, action) {
             // Remove item from cart
             const productIdToRemove = action.payload;
-            state.cart.items = state.cart.items.filter(
-                (item) => item.productId !== productIdToRemove
+            const itemToRemove = state.cart.items.find(
+                (item) => item.productId === productIdToRemove
             );
+            if (itemToRemove) {
+                state.cart.totalItems -= itemToRemove.quantity;
+                state.cart.totalPrice -=
+                    itemToRemove.quantity * itemToRemove.price;
+                state.cart.items = state.cart.items.filter(
+                    (item) => item.productId !== productIdToRemove
+                );
+            }
         },
         updateCartItemQuantity(state, action) {
             // Update quantity of an item in the cart
@@ -55,7 +64,11 @@ const appSlice = createSlice({
                 (item) => item.productId === productId
             );
             if (itemToUpdate) {
+                const quantityDifference = quantity - itemToUpdate.quantity;
                 itemToUpdate.quantity = quantity;
+                state.cart.totalItems += quantityDifference;
+                state.cart.totalPrice +=
+                    quantityDifference * itemToUpdate.price;
             }
         },
         clearCart(state) {

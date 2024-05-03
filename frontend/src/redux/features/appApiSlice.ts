@@ -10,8 +10,8 @@ export const appApiSlice = apiSlice.injectEndpoints({
             transformResponse: ({ data }) => data,
         }),
         getProducts: builder.query({
-            query: () => ({
-                url: "/api/v1/products",
+            query: ({ searchQueryUrl }) => ({
+                url: searchQueryUrl,
                 method: "GET",
             }),
             transformResponse: ({ data }) => data,

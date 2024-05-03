@@ -13,7 +13,7 @@ const baseQuery = fetchBaseQuery({
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const state = getState() as RootState;
-        const token = state.auth.access_token;
+        const token = state?.auth?.access_token;
 
         if (token) {
             headers.set("authorization", `Bearer ${token}`);
@@ -34,9 +34,9 @@ const baseQueryWithReAuth = async (
         const { data } = await baseQuery("/api/v1/refresh", api, extraOptions);
 
         const refreshResult = data as IApiResponse<{ accessToken: string }>;
-        if (refreshResult.statusCode === 200) {
+        if (refreshResult?.statusCode === 200) {
             const state = api.getState() as RootState;
-            const user = state.auth.user as IUser;
+            const user = state?.auth?.user as IUser;
             // store the new token
             api.dispatch(
                 authSuccess({

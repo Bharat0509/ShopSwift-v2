@@ -27,6 +27,7 @@ import { Separator } from "../ui/separator";
 import { useAppSelector } from "@/redux/hooks";
 import { selectCart } from "@/redux/features/appSlice";
 import { ICartItem } from "@/lib/typing";
+import { Link } from "react-router-dom";
 
 export default function Cart() {
     const { items, totalItems, totalPrice } = useAppSelector(selectCart);
@@ -39,30 +40,30 @@ export default function Cart() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className='lg:flex gap-4 w-full'>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className='hidden w-[100px] sm:table-cell'>
-                                    <span className='sr-only'>img</span>
-                                </TableHead>
-                                <TableHead>Name</TableHead>
+                <div className='lg:flex gap-4 w-full '>
+                    {totalItems > 0 ? (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className='hidden w-[100px] sm:table-cell'>
+                                        <span className='sr-only'>img</span>
+                                    </TableHead>
+                                    <TableHead>Name</TableHead>
 
-                                <TableHead>Price</TableHead>
-                                <TableHead className='hidden md:table-cell'>
-                                    Quantity
-                                </TableHead>
-                                <TableHead className='hidden md:table-cell'>
-                                    SubTotal
-                                </TableHead>
-                                <TableHead>
-                                    <span className='sr-only'>Actions</span>
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items.length > 0 ? (
-                                items.map((item: ICartItem) => (
+                                    <TableHead>Price</TableHead>
+                                    <TableHead className='hidden md:table-cell'>
+                                        Quantity
+                                    </TableHead>
+                                    <TableHead className='hidden md:table-cell'>
+                                        SubTotal
+                                    </TableHead>
+                                    <TableHead>
+                                        <span className='sr-only'>Actions</span>
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {items.map((item: ICartItem) => (
                                     <TableRow key={item.productId}>
                                         <TableCell className='hidden sm:table-cell'>
                                             <img
@@ -70,7 +71,7 @@ export default function Cart() {
                                                 className='aspect-square rounded-md object-cover'
                                                 height='64'
                                                 src={
-                                                    item.images[0].url ??
+                                                    item?.images?.[0].url ??
                                                     "/placeholder.svg"
                                                 }
                                                 width='64'
@@ -115,31 +116,25 @@ export default function Cart() {
                                             </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            ) : (
-                                <TableRow className='text-center w-full '>
-                                    <TableCell className='w-full '>
-                                        <h3 className='text-2xl font-bold tracking-tight '>
-                                            You have no products
-                                        </h3>
-                                        <p className='text-sm text-muted-foreground'>
-                                            You can start selling as soon as you
-                                            add a product.
-                                        </p>
-                                        <Button className='mt-4'>
-                                            Add Product
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-
+                                ))}
+                            </TableBody>
+                        </Table>
+                    ) : (
+                        <div className='w-full flex-col h-40 flex items-center justify-center'>
+                            <h3 className='text-2xl font-bold tracking-tight '>
+                                You have no products in your cart
+                            </h3>
+                            <p className='text-sm text-muted-foreground'>
+                                You can start adding products from shop page .
+                            </p>
+                            <Button className='mt-4'>Add Product</Button>
+                        </div>
+                    )}
                     {totalItems > 0 && (
-                        <Card className='overflow-hidden mt-4 lg:mt-0 lg:w-96'>
-                            <CardContent className='p-6 text-sm'>
-                                <div className='grid gap-3'>
-                                    <div className='font-semibold'>
+                        <Card className='overflow-hidden mt-0 lg:w-96'>
+                            <CardContent className='px-6 text-sm'>
+                                <div className='grid '>
+                                    <div className='font-semibold m-auto p-1.5'>
                                         Order Summary
                                     </div>
 
@@ -163,6 +158,7 @@ export default function Cart() {
                                             </span>
                                             <span>$25.00</span>
                                         </li>
+                                        <Separator />
                                         <li className='flex items-center justify-between font-semibold'>
                                             <span className='text-muted-foreground'>
                                                 Total
@@ -170,8 +166,13 @@ export default function Cart() {
                                             <span>${totalPrice + 30}</span>
                                         </li>
                                     </ul>
-                                    <Button className='rounded-sm'>
-                                        Continue for Payment
+                                    <Button className='rounded-sm mt-3'>
+                                        <Link
+                                            to={"/account/place-order"}
+                                            className='w-full'
+                                        >
+                                            Place Order
+                                        </Link>
                                     </Button>
                                 </div>
                             </CardContent>

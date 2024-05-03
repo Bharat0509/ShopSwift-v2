@@ -18,12 +18,16 @@ import LogOut from "./components/LogOut";
 import ProductInfo from "./components/ProductDetail";
 import { ForgotPassword } from "./components/Authentication/ForgotPassword";
 import { ResetPassword } from "./components/Authentication/ResetPassword";
+import PlaceOrder from "./components/Cart/PlaceOrder";
+import WrapperScrollToTop from "./components/ui/scrollToTop";
 
 function App() {
     return (
         <main>
             <Router>
-                <Navbar />
+                <WrapperScrollToTop>
+                    <Navbar />
+                </WrapperScrollToTop>
                 <Routes>
                     <Route path='/' index element={<Home />} />
                     <Route path='/auth' element={<Authentication />} />
@@ -41,6 +45,7 @@ function App() {
                     <Route path='/account' element={<AuthenticatedOutlet />}>
                         <Route index element={<Profile />} />
                         <Route path='cart' element={<Cart />} />
+                        <Route path='place-order' element={<PlaceOrder />} />
                         <Route path='orders' element={<Orders />} />
                         <Route path='orders/:orderId' element={<Order />} />
                     </Route>

@@ -2,11 +2,13 @@ import { Filter, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { IProduct } from "@/lib/typing";
+import { useGetProductsQuery } from "@/redux/features/appApiSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { z } from "zod";
 import { ProductCard } from "../ProductCard/product-card";
 import {
@@ -76,20 +78,35 @@ const defaultValues: Partial<DisplayFormValues> = {
     rating: "1 Start or more",
 };
 export function Shop() {
-    const dispatch = useAppDispatch();
-    const { products } = useAppSelector((state) => state.app);
+    const location = useLocation();
     const form = useForm<DisplayFormValues>({
         resolver: zodResolver(displayFormSchema),
         defaultValues,
     });
+    let products: IProduct[] = [];
+    let productsQueryUrl: string = `/api/v1/products?category=${form.getValues(
+        "categories"
+    )}&rating=${form.getValues("categories")}`;
+    const { data: result, refetch } = useGetProductsQuery(
+        { searchQueryUrl: productsQueryUrl },
+        {
+            refetchOnFocus: true,
+            refetchOnMountOrArgChange: true,
+            refetchOnReconnect: true,
+        }
+    );
+    products = result.products;
+
     function onSubmit(data: DisplayFormValues) {
         console.log(data);
     }
     useEffect(() => {
-        if (!products?.length) {
-            // dispatch(fetchAppProducts());
-        }
-    }, [dispatch, products?.length]);
+        productsQueryUrl = `/api/v1/products?category=${form.getValues(
+            "categories"
+        )}&rating=${form.getValues("categories")}`;
+        refetch();
+    }, [refetch, location]);
+
     return (
         <div className='grid h-[calc(100vh-64px)] fixed w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
             <div className='hidden border-r bg-muted/40 md:block'>
@@ -479,20 +496,17 @@ export function Shop() {
                     </Breadcrumb>
                 </header>
                 <main className='flex items-center justify-center w-full  p-2 md:p-4 overflow-scroll'>
-                    <div className='flex gap-2 flex-wrap overflow-scroll h-[85vh]'>
+                    <div className='flex gap-2 flex-wrap overflow-scroll space gap-y-8 h-[85vh]'>
                         {(products || []).map((product) => (
                             <ProductCard
                                 key={product._id}
                                 product={product}
-                                className='w-[150px] md:w-[200px] lg:w-[250px]'
-                                width={250}
-                                height={250}
+                                className='w-[150px] sm:w-[200px] md:w-[200px] lg:w-[225px]'
+                                width={300}
+                                height={300}
                             />
                         ))}
                     </div>
-
-                    {/* <ScrollBar orientation='horizontal' className='h-2' /> */}
-                    {/* </ScrollArea> */}
                 </main>
             </div>
         </div>
