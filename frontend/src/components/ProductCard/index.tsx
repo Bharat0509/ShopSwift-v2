@@ -10,8 +10,9 @@ interface IProductsData {
     products: IProduct[];
 }
 export default function HomeProducts() {
-    const { data, isSuccess } = useGetProductsQuery("products");
-
+    const { data, isSuccess } = useGetProductsQuery({
+        searchQueryUrl: `/api/v1/products?category=all&rating[gte]=0`,
+    });
     return (
         <>
             <div className='px-4 md:px-6 pt-4 md:block z-0'>

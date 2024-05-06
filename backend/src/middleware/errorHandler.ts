@@ -34,8 +34,6 @@ const errorHandlerMiddleware = (
 
     // JWT Error handling
     if (err.name === "JsonWebTokenError") {
-        console.log("Json", err);
-
         statusCode = 401;
         message = "Json Web Token is invalid, please try again.";
     }

@@ -12,11 +12,11 @@ import verifyJWT from "../middleware/verifyJWT";
 
 const router: Router = express.Router();
 
-router.route("/order/new").post(verifyJWT, newOrder);
+router.route("/orders/new").post(verifyJWT, newOrder);
 
-router.route("/order/:id").get(verifyJWT, getSingleOrder);
+router.route("/orders/:id").get(verifyJWT, getSingleOrder);
 
-router.route("/orders/me").get(verifyJWT, myOrders);
+router.route("/me/orders").get(verifyJWT, myOrders);
 
 router
     .route("/admin/orders")

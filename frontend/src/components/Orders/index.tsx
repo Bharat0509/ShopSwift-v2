@@ -16,6 +16,7 @@ import {
 import { IOrder } from "@/lib/typing";
 import { cn } from "@/lib/utils";
 import { useGetMyOrdersQuery } from "@/redux/features/appApiSlice";
+import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import {
     Breadcrumb,
@@ -26,16 +27,17 @@ import {
     BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { Skeleton } from "../ui/skeleton";
-import { toast } from "react-hot-toast";
 
 export default function Component() {
-    const { isLoading, data, isError } = useGetMyOrdersQuery({
+    const { isLoading, data, error } = useGetMyOrdersQuery({
         refetchOnFocus: true,
         pollingInterval: 500,
     });
     const result = data as { orders: IOrder[] };
-    if (isError) {
-        toast.error("Failed to fetch orders.");
+    if (error) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-expect-error
+        toast.error(error?.data?.error ?? "Failed to fetch orders.");
     }
     return (
         <Card>
@@ -129,18 +131,26 @@ export default function Component() {
                                             </div>
                                         </TableCell>
                                         <TableCell className='hidden sm:table-cell text-center'>
-                                            Sale
+                                            Card Payment
                                         </TableCell>
                                         <TableCell className='hidden sm:table-cell text-center'>
                                             <Badge
-                                                className='text-xs'
+                                                className={cn([
+                                                    "text-xs",
+                                                    order.orderStatus ===
+                                                        "Delivered" &&
+                                                        "bg-green-600",
+                                                    order.orderStatus ===
+                                                        "Processing" &&
+                                                        "bg-zinc-600",
+                                                ])}
                                                 variant='secondary'
                                             >
                                                 {order.orderStatus}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className='hidden md:table-cell text-center'>
-                                            {order.createAt.split("T")[0]}
+                                            {order?.createAt?.split("T")?.[0]}
                                         </TableCell>
                                         <TableCell className='text-center'>
                                             Rs.{order.totalPrice.toFixed(2)}

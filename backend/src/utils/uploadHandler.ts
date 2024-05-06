@@ -6,7 +6,6 @@ interface CloudinaryConfig {
     api_key: string;
     api_secret: string;
 }
-
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME as string,
     api_key: process.env.CLOUDINARY_API_KEY as string,

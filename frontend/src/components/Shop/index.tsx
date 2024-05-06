@@ -1,14 +1,11 @@
-import { Filter, Star } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { IProduct } from "@/lib/typing";
 import { useGetProductsQuery } from "@/redux/features/appApiSlice";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Link, useLocation } from "react-router-dom";
-import { z } from "zod";
+import { CheckedState } from "@radix-ui/react-checkbox";
+import { Filter, Star } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ProductCard } from "../ProductCard/product-card";
 import {
     Breadcrumb,
@@ -19,19 +16,13 @@ import {
     BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { Checkbox } from "../ui/checkbox";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "../ui/form";
+import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
 
 const categories = [
+    { id: "all", label: "All" },
     {
         id: "electronics",
         label: "Electronics",
@@ -58,53 +49,34 @@ const categories = [
     },
 ] as const;
 
-const displayFormSchema = z.object({
-    categories: z
-        .array(z.string())
-        .refine((value) => value.some((item) => item), {
-            message: "You have to select at least one category.",
-        }),
-    rating: z.string({
-        message: "You have to select at least one rating.",
-    }),
-});
-
-type DisplayFormValues = z.infer<typeof displayFormSchema>;
-
-// This can come from your database or API.
-const defaultValues: Partial<DisplayFormValues> = {
-    categories: ["all"],
-    rating: "1 Start or more",
-};
 export function Shop() {
-    const location = useLocation();
-    const form = useForm<DisplayFormValues>({
-        resolver: zodResolver(displayFormSchema),
-        defaultValues,
+    const [filters, setFilters] = useState({
+        rating: 1,
+        categories: "",
+        sort: 0,
     });
+
     let products: IProduct[] = [];
-    let productsQueryUrl: string = `/api/v1/products?category=${form.getValues(
-        "categories"
-    )}&rating=${form.getValues("categories")}`;
-    const { data: result, refetch } = useGetProductsQuery(
-        { searchQueryUrl: productsQueryUrl },
+
+    const { data: result } = useGetProductsQuery(
+        {
+            searchQueryUrl: `/api/v1/products?category=${filters.categories}&rating[gte]=${filters.rating}`,
+        },
         {
             refetchOnFocus: true,
             refetchOnMountOrArgChange: true,
             refetchOnReconnect: true,
         }
     );
-    products = result.products;
+    products = result?.products ?? [];
 
-    function onSubmit(data: DisplayFormValues) {
-        console.log(data);
-    }
-    useEffect(() => {
-        productsQueryUrl = `/api/v1/products?category=${form.getValues(
-            "categories"
-        )}&rating=${form.getValues("categories")}`;
-        refetch();
-    }, [refetch, location]);
+    const handleCheckedChange = (id: string, checked: CheckedState) => {
+        if (checked) {
+            setFilters((prev) => ({ ...prev, categories: id }));
+        } else {
+            setFilters((prev) => ({ ...prev, categories: "" }));
+        }
+    };
 
     return (
         <div className='grid h-[calc(100vh-64px)] fixed w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
@@ -115,166 +87,98 @@ export function Shop() {
                             to='/'
                             className='flex items-center gap-2 font-semibold'
                         >
-                            <span className=''>Filter Products</span>
+                            <span className=''>Filter Products </span>
                         </Link>
                     </div>
                     <div className='flex-1 px-4 lg:px-6 overflow-scroll '>
                         <ScrollArea>
-                            <Form {...form}>
-                                <form
-                                    onSubmit={form.handleSubmit(onSubmit)}
-                                    className='space-y-8'
+                            <div className='space-y-3'>
+                                <div className='mb-4 space-y-2'>
+                                    <Label className='text-base'>
+                                        Select Category
+                                        <Separator className='mt-2' />
+                                    </Label>
+                                    <div className='space-y-2'>
+                                        {categories.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className='flex flex-row items-start space-x-3 space-y-0'
+                                            >
+                                                <Checkbox
+                                                    checked={filters.categories?.includes(
+                                                        item.id
+                                                    )}
+                                                    onCheckedChange={(
+                                                        checked: CheckedState
+                                                    ) =>
+                                                        handleCheckedChange(
+                                                            item.id,
+                                                            checked
+                                                        )
+                                                    }
+                                                />
+
+                                                <Label className='font-normal'>
+                                                    {item.label}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='space-y-2'>
+                                <Label>
+                                    Ratings More than
+                                    <Separator className='mt-2' />
+                                </Label>
+
+                                <RadioGroup
+                                    onValueChange={(val) => {
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            rating: parseInt(val),
+                                        }));
+                                    }}
+                                    className='flex flex-col space-y-1'
                                 >
-                                    <FormField
-                                        control={form.control}
-                                        name='categories'
-                                        render={() => (
-                                            <FormItem>
-                                                <div className='mb-4'>
-                                                    <FormLabel className='text-base'>
-                                                        Select Category
-                                                        <Separator className='mt-2' />
-                                                    </FormLabel>
-                                                </div>
-                                                {categories.map((item) => (
-                                                    <FormField
-                                                        key={item.id}
-                                                        control={form.control}
-                                                        name='categories'
-                                                        render={({ field }) => {
-                                                            return (
-                                                                <FormItem
-                                                                    key={
-                                                                        item.id
-                                                                    }
-                                                                    className='flex flex-row items-start space-x-3 space-y-0'
-                                                                >
-                                                                    <FormControl>
-                                                                        <Checkbox
-                                                                            checked={field.value?.includes(
-                                                                                item.id
-                                                                            )}
-                                                                            onCheckedChange={(
-                                                                                checked
-                                                                            ) => {
-                                                                                return checked
-                                                                                    ? field.onChange(
-                                                                                          [
-                                                                                              ...field.value,
-                                                                                              item.id,
-                                                                                          ]
-                                                                                      )
-                                                                                    : field.onChange(
-                                                                                          field.value?.filter(
-                                                                                              (
-                                                                                                  value
-                                                                                              ) =>
-                                                                                                  value !==
-                                                                                                  item.id
-                                                                                          )
-                                                                                      );
-                                                                            }}
-                                                                        />
-                                                                    </FormControl>
-                                                                    <FormLabel className='font-normal'>
-                                                                        {
-                                                                            item.label
-                                                                        }
-                                                                    </FormLabel>
-                                                                </FormItem>
-                                                            );
-                                                        }}
-                                                    />
-                                                ))}
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name='rating'
-                                        render={({ field }) => (
-                                            <FormItem className='space-y-3'>
-                                                <FormLabel>
-                                                    Ratings More than.
-                                                    <Separator className='mt-2' />
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <RadioGroup
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        defaultValue={
-                                                            field.value
-                                                        }
-                                                        className='flex flex-col space-y-1'
-                                                    >
-                                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                            <FormControl>
-                                                                <RadioGroupItem value='1' />
-                                                            </FormControl>
-                                                            <FormLabel className='font-normal flex'>
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                            <FormControl>
-                                                                <RadioGroupItem value='2' />
-                                                            </FormControl>
-                                                            <FormLabel className='flex gap-2'>
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                            <FormControl>
-                                                                <RadioGroupItem value='3' />
-                                                            </FormControl>
-                                                            <FormLabel className='flex gap-2'>
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                            <FormControl>
-                                                                <RadioGroupItem value='4' />
-                                                            </FormControl>
-                                                            <FormLabel className='flex gap-2'>
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                                <Star
-                                                                    size={16}
-                                                                />
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </form>
-                            </Form>
+                                    <div className='flex items-center space-x-3 space-y-0'>
+                                        <RadioGroupItem value='1' />
+
+                                        <Label className='flex gap-2'>
+                                            <Star size={16} />
+                                        </Label>
+                                    </div>
+                                    <div className='flex items-center space-x-3 space-y-0'>
+                                        <RadioGroupItem value='2' />
+
+                                        <Label className='flex gap-2'>
+                                            <Star size={16} />
+                                            <Star size={16} />
+                                        </Label>
+                                    </div>
+                                    <div className='flex items-center space-x-3 space-y-0'>
+                                        <RadioGroupItem value='3' />
+
+                                        <Label className='flex gap-2'>
+                                            <Star size={16} />
+                                            <Star size={16} />
+                                            <Star size={16} />
+                                        </Label>
+                                    </div>
+
+                                    <div className='flex items-center space-x-3 space-y-0'>
+                                        <RadioGroupItem value='4' />
+
+                                        <Label className='flex gap-2'>
+                                            <Star size={16} />
+                                            <Star size={16} />
+                                            <Star size={16} />
+                                            <Star size={16} />
+                                        </Label>
+                                    </div>
+                                </RadioGroup>
+                            </div>
+
                             <ScrollBar orientation='vertical' />
                         </ScrollArea>
                     </div>
@@ -297,185 +201,89 @@ export function Shop() {
                         </SheetTrigger>
                         <SheetContent side='bottom' className='flex flex-col'>
                             <ScrollArea>
-                                <Form {...form}>
-                                    <form
-                                        onSubmit={form.handleSubmit(onSubmit)}
-                                        className='space-y-8'
+                                <div className='space-y-3'>
+                                    <div className='mb-4'>
+                                        <Label className='text-base'>
+                                            Select Category
+                                            <Separator className='mt-2' />
+                                        </Label>
+
+                                        {categories.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className='flex flex-row items-start space-x-3 space-y-0'
+                                            >
+                                                <Checkbox
+                                                    checked={filters.categories?.includes(
+                                                        item.id
+                                                    )}
+                                                    onCheckedChange={(
+                                                        checked: CheckedState
+                                                    ) =>
+                                                        handleCheckedChange(
+                                                            item.id,
+                                                            checked
+                                                        )
+                                                    }
+                                                />
+
+                                                <Label className='font-normal'>
+                                                    {item.label}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>
+                                        Ratings More than
+                                        <Separator className='mt-2' />
+                                    </Label>
+
+                                    <RadioGroup
+                                        onValueChange={(val) =>
+                                            console.log(val)
+                                        }
+                                        className='flex flex-col space-y-1'
                                     >
-                                        <FormField
-                                            control={form.control}
-                                            name='categories'
-                                            render={() => (
-                                                <FormItem>
-                                                    <div className='mb-4'>
-                                                        <FormLabel className='text-base'>
-                                                            Select Category
-                                                            <Separator className='mt-2' />
-                                                        </FormLabel>
-                                                    </div>
-                                                    {categories.map((item) => (
-                                                        <FormField
-                                                            key={item.id}
-                                                            control={
-                                                                form.control
-                                                            }
-                                                            name='categories'
-                                                            render={({
-                                                                field,
-                                                            }) => {
-                                                                return (
-                                                                    <FormItem
-                                                                        key={
-                                                                            item.id
-                                                                        }
-                                                                        className='flex flex-row items-start space-x-3 space-y-0'
-                                                                    >
-                                                                        <FormControl>
-                                                                            <Checkbox
-                                                                                checked={field.value?.includes(
-                                                                                    item.id
-                                                                                )}
-                                                                                onCheckedChange={(
-                                                                                    checked
-                                                                                ) => {
-                                                                                    return checked
-                                                                                        ? field.onChange(
-                                                                                              [
-                                                                                                  ...field.value,
-                                                                                                  item.id,
-                                                                                              ]
-                                                                                          )
-                                                                                        : field.onChange(
-                                                                                              field.value?.filter(
-                                                                                                  (
-                                                                                                      value
-                                                                                                  ) =>
-                                                                                                      value !==
-                                                                                                      item.id
-                                                                                              )
-                                                                                          );
-                                                                                }}
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormLabel className='font-normal'>
-                                                                            {
-                                                                                item.label
-                                                                            }
-                                                                        </FormLabel>
-                                                                    </FormItem>
-                                                                );
-                                                            }}
-                                                        />
-                                                    ))}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name='rating'
-                                            render={({ field }) => (
-                                                <FormItem className='space-y-3'>
-                                                    <FormLabel>
-                                                        Ratings More than.
-                                                        <Separator className='mt-2' />
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <RadioGroup
-                                                            onValueChange={
-                                                                field.onChange
-                                                            }
-                                                            defaultValue={
-                                                                field.value
-                                                            }
-                                                            className='flex flex-col space-y-1'
-                                                        >
-                                                            <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                                <FormControl>
-                                                                    <RadioGroupItem value='1' />
-                                                                </FormControl>
-                                                                <FormLabel className='font-normal flex'>
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                            <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                                <FormControl>
-                                                                    <RadioGroupItem value='2' />
-                                                                </FormControl>
-                                                                <FormLabel className='flex gap-2'>
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                            <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                                <FormControl>
-                                                                    <RadioGroupItem value='3' />
-                                                                </FormControl>
-                                                                <FormLabel className='flex gap-2'>
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                            <FormItem className='flex items-center space-x-3 space-y-0'>
-                                                                <FormControl>
-                                                                    <RadioGroupItem value='4' />
-                                                                </FormControl>
-                                                                <FormLabel className='flex gap-2'>
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                    <Star
-                                                                        size={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                        </RadioGroup>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </form>
-                                </Form>
+                                        <div className='flex items-center space-x-3 space-y-0'>
+                                            <RadioGroupItem value='1' />
+
+                                            <Label className='flex gap-2'>
+                                                <Star size={16} />
+                                            </Label>
+                                        </div>
+                                        <div className='flex items-center space-x-3 space-y-0'>
+                                            <RadioGroupItem value='2' />
+
+                                            <Label className='flex gap-2'>
+                                                <Star size={16} />
+                                                <Star size={16} />
+                                            </Label>
+                                        </div>
+                                        <div className='flex items-center space-x-3 space-y-0'>
+                                            <RadioGroupItem value='3' />
+
+                                            <Label className='flex gap-2'>
+                                                <Star size={16} />
+                                                <Star size={16} />
+                                                <Star size={16} />
+                                            </Label>
+                                        </div>
+
+                                        <div className='flex items-center space-x-3 space-y-0'>
+                                            <RadioGroupItem value='4' />
+
+                                            <Label className='flex gap-2'>
+                                                <Star size={16} />
+                                                <Star size={16} />
+                                                <Star size={16} />
+                                                <Star size={16} />
+                                            </Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+
                                 <ScrollBar orientation='vertical' />
                             </ScrollArea>
                         </SheetContent>
@@ -495,7 +303,7 @@ export function Shop() {
                     </Breadcrumb>
                 </header>
                 <main className='flex items-center justify-center w-full  p-2 md:p-4 overflow-scroll'>
-                    <div className='flex gap-2 flex-wrap overflow-scroll space gap-y-8 h-[85vh]'>
+                    <div className='flex gap-2 flex-wrap overflow-scroll space gap-y-8 h-[85vh] pb-20'>
                         {(products || []).map((product) => (
                             <ProductCard
                                 key={product._id}

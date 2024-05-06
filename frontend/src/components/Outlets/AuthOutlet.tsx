@@ -16,7 +16,7 @@ const AuthenticatedOutlet = () => {
         <Navigate
             to='/auth'
             replace={false}
-            state={{ redirectUrl: location.pathname }}
+            state={{ redirectUrl: location.pathname + location.search }}
         />
     );
 };

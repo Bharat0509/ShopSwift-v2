@@ -4,31 +4,44 @@ import Product from "../models/product";
 import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
+import mongoose from "mongoose";
+import { sendOrderPlacedEmail } from "../emailTemplates";
 
 // Create New Order
 export const newOrder = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const {
-            shippingInfo,
-            orderItems,
-            paymentInfo,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            totalPrice,
-        } = req.body;
+        const { paymentInfo, orderInfo } = req.body;
 
+        const currentDate = new Date();
+        const threeDaysFromNow = new Date(currentDate);
+        threeDaysFromNow.setDate(currentDate.getDate() + 3);
         const order = await Order.create({
-            shippingInfo,
-            orderItems,
-            paymentInfo,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            totalPrice,
+            shippingInfo: {
+                address:
+                    orderInfo.orderDeliveryInfo?.shippingAddressDetails +
+                    " ," +
+                    orderInfo.orderDeliveryInfo?.shippingAddress,
+                city: paymentInfo.shipping?.city ?? "Unknown",
+                state: paymentInfo.shipping?.state ?? "Unknown",
+                country: paymentInfo.shipping?.country ?? "Unknown",
+                pinCode: paymentInfo.shipping?.postal_code ?? 234567,
+                phoneNo:
+                    orderInfo.orderDeliveryInfo?.contactNumber ?? 12345678899,
+            },
+            orderItems: orderInfo.orderItems,
+            user: req.user.userId,
+            paymentInfo: {
+                id: paymentInfo.id,
+                status: paymentInfo.status,
+            },
             paidAt: Date.now(),
-            user: req.user,
+            itemsPrice: orderInfo.orderSubTotalPrice,
+            taxPrice: orderInfo.orderTaxPrice,
+            shippingPrice: orderInfo.orderSubTotalPrice,
+            totalPrice: orderInfo.orderTotalPayable,
+            deliveredAt: threeDaysFromNow,
         });
+        await sendOrderPlacedEmail(order, req?.user?.email);
 
         const apiResponse = new ApiResponse(
             200,
@@ -132,7 +145,8 @@ export const deleteOrder = asyncHandler(
 // Get Logged in user Orders
 export const myOrders = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const orders = await Order.find({ user: "658bff50199d4a7761be5c99" });
+        const userId = new mongoose.Types.ObjectId(req.user.userId);
+        const orders = await Order.find({ user: userId });
 
         const apiResponse = new ApiResponse(
             200,

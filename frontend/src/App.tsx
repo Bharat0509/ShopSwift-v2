@@ -20,6 +20,8 @@ import { ForgotPassword } from "./components/Authentication/ForgotPassword";
 import { ResetPassword } from "./components/Authentication/ResetPassword";
 import PlaceOrder from "./components/Cart/PlaceOrder";
 import WrapperScrollToTop from "./components/ui/scrollToTop";
+import ProcessPayment from "./components/Cart/ProcessPayment";
+import ProcessPaymentSuccess from "./components/Cart/ProcessPaymentSuccess";
 
 function App() {
     return (
@@ -46,6 +48,14 @@ function App() {
                         <Route index element={<Profile />} />
                         <Route path='cart' element={<Cart />} />
                         <Route path='place-order' element={<PlaceOrder />} />
+                        <Route
+                            path='process-payment'
+                            element={<ProcessPayment />}
+                        />
+                        <Route
+                            path='process-payment/success'
+                            element={<ProcessPaymentSuccess />}
+                        />
                         <Route path='orders' element={<Orders />} />
                         <Route path='orders/:orderId' element={<Order />} />
                     </Route>

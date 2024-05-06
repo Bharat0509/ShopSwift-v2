@@ -28,10 +28,12 @@ import { Input } from "@/components/ui/input";
 // import { AxiosError } from "axios";
 import { Pencil } from "lucide-react";
 // import { toast } from "react-hot-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { selectAuthObject } from "@/redux/features/authSlice";
+import { cn } from "@/lib/utils";
 import { useUpdateProfileMutation } from "@/redux/features/authApiSlice";
+import { selectAuthObject } from "@/redux/features/authSlice";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const profileFormSchema = z.object({
     name: z
@@ -56,6 +58,7 @@ export default function Profile() {
     const { user } = useAppSelector(selectAuthObject);
 
     const [updateProfile] = useUpdateProfileMutation();
+    const [imageLoading, setImageLoading] = useState(false);
     const defaultValues: Partial<ProfileFormValues> = {
         name: user?.name ?? "user",
         email: user?.email ?? "user@gmail.com",
@@ -68,12 +71,10 @@ export default function Profile() {
     });
 
     async function onSubmit(profileData: ProfileFormValues) {
-        const profileUpdateToastId = toast.loading("Updating Profile...", {
-            duration: 5000,
-        });
+        const profileUpdateToastId = toast.loading("Updating Profile...");
 
         try {
-            await updateProfile(profileData);
+            await updateProfile(profileData).unwrap();
             toast.success("Profile Updated !", { id: profileUpdateToastId });
         } catch (error) {
             toast.error(
@@ -91,7 +92,7 @@ export default function Profile() {
         }
 
         const reader = new FileReader();
-
+        reader.onloadstart = () => setImageLoading(true);
         reader.onload = () => {
             if (reader.readyState === 2) {
                 const result = reader.result;
@@ -100,6 +101,7 @@ export default function Profile() {
                 } else {
                     console.error("Failed to read file as string");
                 }
+                setImageLoading(false);
             }
         };
 
@@ -132,7 +134,13 @@ export default function Profile() {
                         render={({ field }) => (
                             <FormItem className='flex items-center'>
                                 <FormControl>
-                                    <Avatar className='h-32 w-32'>
+                                    <Avatar
+                                        className={cn([
+                                            "h-32 w-32",
+                                            imageLoading &&
+                                                "animate-pulse bg-secondary",
+                                        ])}
+                                    >
                                         <AvatarImage
                                             src={
                                                 field.value ??
@@ -141,7 +149,7 @@ export default function Profile() {
                                             alt='User'
                                         />
                                         <AvatarFallback>
-                                            {field?.value}
+                                            {form.getValues("name")}
                                         </AvatarFallback>
                                     </Avatar>
                                 </FormControl>

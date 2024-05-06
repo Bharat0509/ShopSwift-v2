@@ -4,6 +4,7 @@ import Product from "../models/product";
 import ApiError from "../utils/ApiError";
 import asyncHandler from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/ApiResponse";
+import ApiFilter, { QueryString } from "../utils/ApiFilter";
 // Define a custom property on the Request object to store decoded user information
 declare global {
     namespace Express {
@@ -55,17 +56,21 @@ export const getAllProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const resultPerPage = 10;
         const productsCount = await Product.countDocuments();
-        // const apiFeature = new ApiFeatures(Product.find(), req.query)
-        //     .search()
-        //     .filter()
-        //     .sort()
-        //     .pagination(resultPerPage);
 
-        const products = await Product.find();
+        const productQuery = new ApiFilter(
+            Product.find(),
+            req.query as QueryString
+        )
+            .search()
+            .filter()
+            .sort()
+            .pagination(resultPerPage);
+
+        const products = await productQuery.query.exec();
 
         const apiResponse = new ApiResponse(
             200,
-            { productsCount, products },
+            { productsCount, products, filteredProduct: products?.length },
             "Products fetched successfully"
         );
         res.status(apiResponse.statusCode).json(apiResponse);

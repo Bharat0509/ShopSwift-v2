@@ -78,10 +78,32 @@ export interface IApiResponse<T> {
     success: boolean;
 }
 
-interface ProfileState {
+export interface ProfileState {
     status: "idle" | "loading" | "authenticated";
     loading: boolean;
     user: IUser | null;
     error: unknown;
     access_token: string | null;
+}
+
+export interface IorderInfo {
+    orderDeliveryInfo: {
+        name?: string | undefined;
+        email?: string | undefined;
+        contactNumber?: string | undefined;
+        shippingAddress?: string | undefined;
+        shippingAddressDetails?: string | undefined;
+    };
+    orderItems: ICartItem[];
+    orderSubTotalPrice: number;
+    orderShippingPrice: number;
+    orderTaxPrice: number;
+    orderTotalPayable: number;
+}
+
+export interface IApiError {
+    statusCode: number;
+    data: unknown;
+    success: boolean;
+    errors: unknown;
 }

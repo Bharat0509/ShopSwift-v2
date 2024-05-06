@@ -1,26 +1,54 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
+import { formValues } from ".";
+import { useAppSelector } from "@/redux/hooks";
+import { selectCart } from "@/redux/features/appSlice";
+import { ICartItem } from "@/lib/typing";
+import { useEffect } from "react";
 
-export function OrderInfo() {
+export function OrderInfo({
+    orderDeliveryInfo,
+}: {
+    orderDeliveryInfo: formValues;
+}) {
+    const { items } = useAppSelector(selectCart);
+    const subTotalPrice = items.reduce(
+        (total: number, currItem: ICartItem) =>
+            total + currItem.price * currItem.quantity,
+        0
+    );
+    const taxPrice = 0.29 * subTotalPrice;
+    const totalPrice = subTotalPrice + 5 + taxPrice;
+
+    useEffect(() => {
+        const orderInfo = {
+            orderDeliveryInfo: orderDeliveryInfo,
+            orderItems: items,
+            orderSubTotalPrice: subTotalPrice,
+            orderShippingPrice: 5,
+            orderTaxPrice: taxPrice,
+            orderTotalPayable: totalPrice,
+        };
+        sessionStorage.setItem("orderInfo", JSON.stringify(orderInfo));
+    }, [items, orderDeliveryInfo, subTotalPrice, taxPrice, totalPrice]);
     return (
         <div className='sm:py-4 w-full flex flex-col md:flex-row justify-between gap-8'>
             <div className='w-full p-4 rounded-md border'>
                 <div className='grid gap-3'>
                     <div className='font-semibold'>Order Details</div>
                     <ul className='grid gap-3'>
-                        <li className='flex items-center justify-between'>
-                            <span className='text-muted-foreground'>
-                                Glimmer Lamps x <span>2</span>
-                            </span>
-                            <span>$250.00</span>
-                        </li>
-                        <li className='flex items-center justify-between'>
-                            <span className='text-muted-foreground'>
-                                Aqua Filters x <span>1</span>
-                            </span>
-                            <span>$49.00</span>
-                        </li>
+                        {items?.map((item) => (
+                            <li
+                                key={item?.productId}
+                                className='flex items-center justify-between'
+                            >
+                                <span className='text-muted-foreground'>
+                                    {item?.name} x <span>{item?.quantity}</span>
+                                </span>
+                                <span>${item?.price.toFixed(2)}</span>
+                            </li>
+                        ))}
                     </ul>
                 </div>
                 <Separator className='my-4' />
@@ -30,9 +58,10 @@ export function OrderInfo() {
                             Shipping Information
                         </div>
                         <address className='grid gap-0.5 not-italic text-muted-foreground'>
-                            <span>Liam Johnson</span>
-                            <span>1234 Main St.</span>
-                            <span>Anytown, CA 12345</span>
+                            <span>{orderDeliveryInfo?.shippingAddress}</span>
+                            <span>
+                                {orderDeliveryInfo?.shippingAddressDetails}
+                            </span>
                         </address>
                     </div>
                 </div>
@@ -42,24 +71,26 @@ export function OrderInfo() {
                     <dl className='grid gap-3'>
                         <div className='flex items-center justify-between'>
                             <dt className='text-muted-foreground'>Customer</dt>
-                            <dd>Liam Johnson</dd>
+                            <dd>{orderDeliveryInfo?.name}</dd>
                         </div>
                         <div className='flex items-center justify-between'>
                             <dt className='text-muted-foreground'>Email</dt>
                             <dd>
-                                <a href='mailto:'>liam@acme.com</a>
+                                <a href='mailto:'>{orderDeliveryInfo?.email}</a>
                             </dd>
                         </div>
                         <div className='flex items-center justify-between'>
                             <dt className='text-muted-foreground'>Phone</dt>
                             <dd>
-                                <a href='tel:'>+1 234 567 890</a>
+                                <a href='tel:'>
+                                    {orderDeliveryInfo?.contactNumber}
+                                </a>
                             </dd>
                         </div>
                     </dl>
                 </div>
             </div>
-            <div className='w-full h-fit p-4 rounded-md border'>
+            <div className='w-full md:max-w-md h-fit p-4 rounded-md border'>
                 <div className='grid gap-3'>
                     <div className='font-semibold'>Order Payment Details</div>
 
@@ -69,7 +100,7 @@ export function OrderInfo() {
                             <span className='text-muted-foreground'>
                                 Subtotal
                             </span>
-                            <span>$299.00</span>
+                            <span>${subTotalPrice.toFixed(2)}</span>
                         </li>
                         <li className='flex items-center justify-between'>
                             <span className='text-muted-foreground'>
@@ -79,11 +110,11 @@ export function OrderInfo() {
                         </li>
                         <li className='flex items-center justify-between'>
                             <span className='text-muted-foreground'>Tax</span>
-                            <span>$25.00</span>
+                            <span>${(0.29 * totalPrice).toFixed(2)}</span>
                         </li>
                         <li className='flex items-center justify-between font-semibold'>
                             <span className='text-muted-foreground'>Total</span>
-                            <span>$329.00</span>
+                            <span>${totalPrice.toFixed(2)}</span>
                         </li>
                     </ul>
                 </div>

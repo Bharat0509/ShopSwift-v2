@@ -17,44 +17,40 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Form } from "@/components/ui/form";
 import { OrderInfo } from "./OrderInfo";
 
 const formSchema = z.object({
-    name: z
-        .string()
-        .min(2, {
-            message: "Username must be at least 2 characters.",
-        })
-        .max(30, {
-            message: "Username must not be longer than 30 characters.",
-        }),
-    email: z
-        .string({
-            required_error: "Please select an email to display.",
-        })
-        .email(),
-    avatar: z.string().url({ message: "Please enter a valid URL." }).optional(),
+    name: z.string().min(2).max(30).optional(),
+    email: z.string().email().optional(),
+    contactNumber: z.string().min(8).max(15).optional(),
+    shippingAddress: z.string().optional(),
+    shippingAddressDetails: z.string().optional(),
 });
 
-type formValues = z.infer<typeof formSchema>;
+export type formValues = z.infer<typeof formSchema>;
 export default function PlaceOrder() {
-    const [currStepNumber, setCurrStepNumber] = useState(3);
+    const defaultValues: Partial<formValues> = {
+        name: "John",
+        email: "john@example.com",
+        contactNumber: "+1234567890",
+        shippingAddress: "123 Shipping Street",
+        shippingAddressDetails: "Apartment 123, Floor 3",
+    };
+    const [currStepNumber, setCurrStepNumber] = useState(1);
+    const [orderDeliveryInfo, setOrderDeliveryInfo] =
+        useState<Partial<formValues>>(defaultValues);
+
     let content = null;
 
-    const defaultValues: Partial<formValues> = {
-        name: "user",
-        email: "user@gmail.com",
-        avatar: "adsljdfd",
-    };
-    const form = useForm<formValues>({
+    const { register, handleSubmit } = useForm<formValues>({
         resolver: zodResolver(formSchema),
         defaultValues,
         mode: "onChange",
     });
 
-    async function onSubmit(profileData: formValues) {
-        console.log(profileData);
+    async function onSubmit(orderDeliveryInfo: formValues) {
+        setOrderDeliveryInfo(orderDeliveryInfo);
+        setCurrStepNumber((prev) => prev + 1);
     }
 
     if (currStepNumber === 1) {
@@ -72,7 +68,11 @@ export default function PlaceOrder() {
                     <div className='grid grid-cols-2 gap-4'>
                         <div className='space-y-2'>
                             <Label htmlFor='name'>Name</Label>
-                            <Input id='name' placeholder='Enter your name' />
+                            <Input
+                                id='name'
+                                placeholder='Enter your name'
+                                {...register("name")}
+                            />
                         </div>
                         <div className='space-y-2'>
                             <Label htmlFor='email'>Email</Label>
@@ -80,6 +80,7 @@ export default function PlaceOrder() {
                                 id='email'
                                 placeholder='Enter your email'
                                 type='email'
+                                {...register("email")}
                             />
                         </div>
                     </div>
@@ -89,6 +90,7 @@ export default function PlaceOrder() {
                         <Input
                             id='contact-number'
                             placeholder='Enter your contact number'
+                            {...register("contactNumber")}
                         />
                     </div>
                     <div className='space-y-2'>
@@ -96,6 +98,7 @@ export default function PlaceOrder() {
                         <Textarea
                             id='address'
                             placeholder='Enter your shipping address'
+                            {...register("shippingAddress")}
                         />
                     </div>
                     <div className='space-y-2'>
@@ -105,17 +108,12 @@ export default function PlaceOrder() {
                         <Input
                             id='address-details'
                             placeholder='Apartment, suite, etc. (optional)'
+                            {...register("shippingAddressDetails")}
                         />
                     </div>
 
                     <div className='flex justify-end'>
-                        <Button
-                            type='button'
-                            onClick={() =>
-                                setCurrStepNumber((prev) => prev + 1)
-                            }
-                            size='lg'
-                        >
+                        <Button type='submit' size='lg'>
                             Next
                         </Button>
                     </div>
@@ -173,12 +171,13 @@ export default function PlaceOrder() {
                                 </li>
                             </ul>
                         </div>
-                        <div className='flex justify-end'>
+                        <div className='flex justify-end gap-2'>
                             <Button
                                 type='button'
                                 onClick={() =>
                                     setCurrStepNumber((prev) => prev - 1)
                                 }
+                                variant='outline'
                                 size='lg'
                             >
                                 Previous
@@ -201,86 +200,7 @@ export default function PlaceOrder() {
     if (currStepNumber === 3) {
         content = (
             <>
-                {/* <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950'>
-                    <div className='w-full max-w-3xl bg-white rounded-lg shadow-lg dark:bg-gray-900'>
-                        <div className='flex items-center justify-between px-6 py-4 border-b dark:border-gray-800'>
-                            <h1 className='text-2xl font-bold'>
-                                Order Summary
-                            </h1>
-                            <div className='flex items-center gap-2'>
-                                <div className='w-2 h-2 rounded-full bg-primary dark:bg-primary' />
-                                <div className='w-2 h-2 rounded-full bg-primary dark:bg-primary' />
-                                <div className='w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600' />
-                            </div>
-                        </div>
-                        <div className='p-6'>
-                            <div className='space-y-4'>
-                                <div className='grid grid-cols-2 gap-4'>
-                                    <div>
-                                        <h3 className='text-lg font-bold'>
-                                            Items
-                                        </h3>
-                                        <div className='space-y-2'>
-                                            <div className='flex items-center justify-between'>
-                                                <span>Product 1</span>
-                                                <span>$49.99</span>
-                                            </div>
-                                            <div className='flex items-center justify-between'>
-                                                <span>Product 2</span>
-                                                <span>$29.99</span>
-                                            </div>
-                                            <div className='flex items-center justify-between'>
-                                                <span>Product 3</span>
-                                                <span>$19.99</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 className='text-lg font-bold'>
-                                            Summary
-                                        </h3>
-                                        <div className='space-y-2'>
-                                            <div className='flex items-center justify-between'>
-                                                <span>Subtotal</span>
-                                                <span>$99.97</span>
-                                            </div>
-                                            <div className='flex items-center justify-between'>
-                                                <span>Shipping</span>
-                                                <span>$5.00</span>
-                                            </div>
-                                            <div className='flex items-center justify-between'>
-                                                <span>Promo Code</span>
-                                                <span className='text-green-500'>
-                                                    -$10.00
-                                                </span>
-                                            </div>
-                                            <div className='flex items-center justify-between'>
-                                                <span>Total</span>
-                                                <span>$94.97</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='flex justify-end gap-4'>
-                                    <Button
-                                        type='button'
-                                        variant='secondary'
-                                        onClick={() =>
-                                            setCurrStepNumber(
-                                                (prev) => prev - 1
-                                            )
-                                        }
-                                        size='lg'
-                                    >
-                                        Previous
-                                    </Button>
-                                    <Button size='lg'>Place Order</Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> */}
-                <OrderInfo />
+                <OrderInfo orderDeliveryInfo={orderDeliveryInfo} />
             </>
         );
     }
@@ -306,9 +226,8 @@ export default function PlaceOrder() {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>{content}</form>
-            </Form>
+
+            <form onSubmit={handleSubmit(onSubmit)}>{content}</form>
         </main>
     );
 }

@@ -1,13 +1,13 @@
-import bcrypt from "bcryptjs";
+import { v2 as cloudinary } from "cloudinary";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { sendForgotPasswordEmail, sendWelcomeEmail } from "../emailTemplates";
 import User, { IUser } from "../models/user";
 import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
-import { Queue } from "bullmq";
-import { sendForgotPasswordEmail, sendWelcomeEmail } from "../emailTemplates";
-
+import * as dotenv from "dotenv";
+dotenv.config();
 // Define a custom property on the Request object to store decoded user information
 declare global {
     namespace Express {
@@ -22,11 +22,20 @@ declare global {
     }
 }
 
+interface CloudinaryConfig {
+    cloud_name: string;
+    api_key: string;
+    api_secret: string;
+}
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME as string,
+    api_key: process.env.CLOUDINARY_API_KEY as string,
+    api_secret: process.env.CLOUDINARY_SECRET_KEY as string,
+} as CloudinaryConfig);
+
 const handleLogin = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { email, password } = req.body;
-
-        await sendWelcomeEmail();
 
         if (!email || !password) {
             throw new ApiError(400, "email and password are required.");
@@ -142,32 +151,29 @@ const handleProfileUpdate = asyncHandler(
             email: req.body.email,
         };
 
-        // if (req.body.avatar !== "") {
-        //     const user = await User.findById(req.user);
-        //     if (!user) {
-        //         return res.status(404).json({
-        //             success: false,
-        //             message: "User not found",
-        //         });
-        //     }
+        if (req.body.avatar !== "") {
+            const user = await User.findById(req.user.userId);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User not found",
+                });
+            }
 
-        //     const imageId = user.avatar.public_id;
-        //     await cloudinary.v2.uploader.destroy(imageId);
+            const imageId = user.avatar.public_id;
+            await cloudinary.uploader.destroy(imageId);
 
-        //     const myCloud = await cloudinary.v2.uploader.upload(
-        //         req.body.avatar,
-        //         {
-        //             folder: "avatars",
-        //             width: 150,
-        //             crop: "scale",
-        //         }
-        //     );
+            const myCloud = await cloudinary.uploader.upload(req.body.avatar, {
+                folder: "avatars",
+                width: 150,
+                crop: "scale",
+            });
 
-        //     newUserData.avatar = {
-        //         public_id: myCloud.public_id,
-        //         url: myCloud.secure_url,
-        //     };
-        // }
+            newUserData.avatar = {
+                public_id: myCloud.public_id,
+                url: myCloud.secure_url,
+            };
+        }
 
         const user = await User.findByIdAndUpdate(
             req.user.userId,
@@ -273,10 +279,7 @@ const handleForgotPassword = asyncHandler(
 
 const handleResetPassword = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        console.log(req.body);
-
         const user = await User.findOne({ resetPasswordToken: req.body.token });
-        console.log(user);
 
         const currDate = new Date(Date.now());
         if (!user) {
@@ -330,12 +333,12 @@ const handleLogout = asyncHandler(
     }
 );
 export {
-    handleLogin,
-    handleRegister,
-    handleProfile,
-    handleRefreshToken,
     handleForgotPassword,
-    handleResetPassword,
+    handleLogin,
     handleLogout,
+    handleProfile,
     handleProfileUpdate,
+    handleRefreshToken,
+    handleRegister,
+    handleResetPassword,
 };

@@ -30,6 +30,8 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-email/render": "^0.0.13",
     "@reduxjs/toolkit": "^2.2.3",
+    "@stripe/react-stripe-js": "^2.7.0",
+    "@stripe/stripe-js": "^3.3.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-autoplay": "^8.0.2",

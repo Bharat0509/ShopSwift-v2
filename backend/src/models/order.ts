@@ -13,7 +13,7 @@ interface IOrder extends Document {
         name: string;
         price: number;
         quantity: number;
-        image: string;
+        image?: string;
         product: mongoose.Schema.Types.ObjectId;
     }[];
     user: mongoose.Schema.Types.ObjectId;
@@ -46,8 +46,8 @@ const orderSchema = new mongoose.Schema<IOrder>(
                 name: { type: String, required: true },
                 price: { type: Number, required: true },
                 quantity: { type: Number, required: true },
-                image: { type: String, required: true },
-                product: {
+                image: { type: String },
+                productId: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "Product",
                     required: true,
@@ -57,7 +57,7 @@ const orderSchema = new mongoose.Schema<IOrder>(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            // required: true,
         },
         paymentInfo: {
             id: { type: String, required: true },
@@ -70,7 +70,6 @@ const orderSchema = new mongoose.Schema<IOrder>(
         totalPrice: { type: Number, default: 0, required: true },
         orderStatus: { type: String, default: "Processing" },
         deliveredAt: Date,
-        createdAt: { type: Date, default: Date.now() },
     },
     { timestamps: true }
 );
