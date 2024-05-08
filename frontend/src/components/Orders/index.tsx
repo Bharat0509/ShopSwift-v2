@@ -27,6 +27,15 @@ import {
     BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { Skeleton } from "../ui/skeleton";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 export default function Component() {
     const { isLoading, data, error } = useGetMyOrdersQuery({
@@ -150,10 +159,49 @@ export default function Component() {
                                             </Badge>
                                         </TableCell>
                                         <TableCell className='hidden md:table-cell text-center'>
-                                            {order?.createAt?.split("T")?.[0]}
+                                            {order?.createdAt?.split("T")?.[0]}
                                         </TableCell>
                                         <TableCell className='text-center'>
                                             Rs.{order.totalPrice.toFixed(2)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        aria-haspopup='true'
+                                                        size='icon'
+                                                        variant='ghost'
+                                                    >
+                                                        <MoreHorizontal className='h-4 w-4' />
+                                                        <span className='sr-only'>
+                                                            Toggle menu
+                                                        </span>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align='end'>
+                                                    <DropdownMenuLabel>
+                                                        Actions
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuItem>
+                                                        <Link
+                                                            className='w-full flex items-center gap-2'
+                                                            to={`/account/orders/${order._id}`}
+                                                        >
+                                                            <Pencil size={16} />{" "}
+                                                            Edit
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem>
+                                                        <Link
+                                                            className='w-full flex items-center gap-2'
+                                                            to={`/account/orders/${order?._id}/delete`}
+                                                        >
+                                                            <Trash2 size={16} />{" "}
+                                                            Delete
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 )

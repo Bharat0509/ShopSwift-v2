@@ -121,7 +121,7 @@ export const updateOrderStatus = asyncHandler(
 
         async function updateStock(id: string, quantity: number) {
             const product = await Product.findById(id);
-            product.stock = product.stock - Number(quantity);
+            product.stock = product.stock - Number(quantity ?? 0);
             await product.save();
         }
     }

@@ -9,6 +9,14 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: ({ data }) => data,
         }),
+        adminUpdateOrder: builder.mutation({
+            query: ({ orderId, updatedOrder }) => ({
+                url: `/api/v1/admin/orders/${orderId}`,
+                method: "PUT",
+                body: updatedOrder,
+            }),
+            transformResponse: ({ data }) => data,
+        }),
         getAdminProducts: builder.query({
             query: () => ({
                 url: "/api/v1/admin/products",
@@ -30,4 +38,5 @@ export const {
     useGetAdminOrdersQuery,
     useGetAdminProductsQuery,
     useAddProductMutation,
+    useAdminUpdateOrderMutation,
 } = dashboardApiSlice;

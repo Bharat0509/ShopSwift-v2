@@ -10,6 +10,15 @@ export const appApiSlice = apiSlice.injectEndpoints({
             keepUnusedDataFor: 60,
             transformResponse: ({ data }) => data,
         }),
+        getMyOrder: builder.query({
+            query: ({ orderId }) => ({
+                url: `/api/v1/orders/${orderId}`,
+                method: "GET",
+            }),
+            keepUnusedDataFor: 60,
+            transformResponse: ({ data }) => data,
+        }),
+
         getProducts: builder.query({
             query: ({ searchQueryUrl }) => ({
                 url: searchQueryUrl,
@@ -39,4 +48,5 @@ export const {
     useGetProductsQuery,
     useGetMyOrdersQuery,
     useGetProductsByIdQuery,
+    useGetMyOrderQuery,
 } = appApiSlice;

@@ -23,7 +23,7 @@ export interface IOrder {
     shippingPrice: number;
     totalPrice: number;
     orderStatus: string;
-    createAt: string;
+    createdAt: string;
 }
 
 export interface ICartItem {

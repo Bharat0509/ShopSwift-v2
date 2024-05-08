@@ -1,9 +1,9 @@
 import { IProduct } from "@/lib/typing";
 import { cn } from "@/lib/utils";
-import { StarIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader } from "../ui/card";
+import ProductRating from "./product-rating";
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
     product: IProduct;
@@ -37,13 +37,11 @@ export function ProductCard({
                         {product.name}
                     </h3>
                     <div className='flex items-center gap-2'>
-                        <StarIcon className='h-5 w-5 fill-yellow-500' />
-                        <StarIcon className='h-5 w-5 fill-yellow-500' />
-                        <StarIcon className='h-5 w-5 fill-yellow-500' />
-                        <StarIcon className='h-5 w-5 fill-yellow-500' />
-                        <StarIcon className='h-5 w-5 fill-gray-300 dark:fill-gray-600' />
+                        <>
+                            <ProductRating ratings={product.ratings} />
+                        </>
                         <span className='text-sm text-gray-600 dark:text-gray-400'>
-                            (4.5)
+                            ({product.ratings})
                         </span>
                     </div>
 

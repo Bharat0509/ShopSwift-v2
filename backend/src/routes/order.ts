@@ -23,7 +23,7 @@ router
     .get(verifyJWT, authorizeRoles("admin"), getAllOrder);
 
 router
-    .route("/admin/order/:id")
+    .route("/admin/orders/:id")
     .put(verifyJWT, authorizeRoles("admin"), updateOrderStatus);
 
 router
