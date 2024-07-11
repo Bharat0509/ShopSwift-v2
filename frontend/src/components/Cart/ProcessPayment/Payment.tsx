@@ -41,13 +41,18 @@ function Payment({
     useEffect(() => {
         // Create PaymentIntent as soon as the page loads
         if (clientSecret) return;
-        fetch("http://localhost:4000/api/v1/payment/create-payment-intent", {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: sessionStorage?.getItem("orderInfo") ?? "",
-        })
+        fetch(
+            `${
+                import.meta.env.VITE_BACKEND_API_BASE_URL
+            }/api/v1/payment/create-payment-intent`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: sessionStorage?.getItem("orderInfo") ?? "",
+            }
+        )
             .then((res) => res.json())
             .then(({ clientSecret }) => setClientSecret(clientSecret));
     }, [clientSecret]);

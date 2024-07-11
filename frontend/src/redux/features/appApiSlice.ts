@@ -33,6 +33,22 @@ export const appApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: ({ data }) => data,
         }),
+        getPublishableKey: builder.query({
+            query: () => ({
+                url: `/api/v1/payment/config`,
+                method: "GET",
+            }),
+            transformResponse: ({ data }) => data,
+            keepUnusedDataFor: 10 * 60,
+        }),
+        getPaymentIntent: builder.mutation({
+            query: ({ orderData }) => ({
+                url: `/api/v1/payment/create-payment-intent`,
+                method: "POST",
+                body: orderData,
+            }),
+            transformResponse: ({ data }) => data,
+        }),
         addItemToCart: builder.mutation({
             query: ({ cartData }) => ({
                 url: `/api/v1/cart/add`,
@@ -49,4 +65,6 @@ export const {
     useGetMyOrdersQuery,
     useGetProductsByIdQuery,
     useGetMyOrderQuery,
+    useGetPublishableKeyQuery,
+    useGetPaymentIntentMutation,
 } = appApiSlice;
