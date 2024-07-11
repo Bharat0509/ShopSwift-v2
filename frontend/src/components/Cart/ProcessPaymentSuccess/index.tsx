@@ -6,7 +6,7 @@ import { CheckIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useLocation } from "react-router-dom";
-
+const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 const ProcessPaymentSuccess = () => {
     const [isLoading, setIsLoading] = useState(false);
     const location = useLocation();
@@ -23,7 +23,8 @@ const ProcessPaymentSuccess = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        fetch("http://localhost:4000/api/v1/payment/config").then(async (r) => {
+
+        fetch(`${BASE_URL}/api/v1/payment/config`).then(async (r) => {
             const { publishableKey } = await r.json();
             setStripePromise(loadStripe(publishableKey));
         });
@@ -49,7 +50,7 @@ const ProcessPaymentSuccess = () => {
             const orderInfo = JSON.parse(
                 sessionStorage.getItem("orderInfo") ?? ""
             );
-            await fetch("http://localhost:4000/api/v1/orders/new", {
+            await fetch(`${BASE_URL}/api/v1/orders/new`, {
                 headers: {
                     Authorization: `Bearer ${access_token}`,
                     "Content-Type": "application/json",
@@ -64,7 +65,7 @@ const ProcessPaymentSuccess = () => {
             setOrderInfo(paymentIntent);
             setIsLoading(false);
         });
-    }, [searchParams, stripePromise]);
+    }, [access_token, searchParams, stripePromise]);
 
     return (
         <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950 py-12 px-4 sm:px-6 lg:px-8 w-full'>
