@@ -25,8 +25,8 @@ const ProcessPaymentSuccess = () => {
         setIsLoading(true);
 
         fetch(`${BASE_URL}/api/v1/payment/config`).then(async (r) => {
-            const { publishableKey } = await r.json();
-            setStripePromise(loadStripe(publishableKey));
+            const {data} = await r.json();
+            setStripePromise(loadStripe(data.publishableKey));
         });
     }, []);
 
