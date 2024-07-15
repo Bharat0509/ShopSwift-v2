@@ -1,7 +1,11 @@
 import { v2 as cloudinary } from "cloudinary";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { sendForgotPasswordEmail, sendWelcomeEmail } from "../emailTemplates";
+import {
+    sendEmail,
+    sendForgotPasswordEmail,
+    sendWelcomeEmail,
+} from "../emailTemplates";
 import User, { IUser } from "../models/user";
 import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -85,7 +89,7 @@ const handleLogin = asyncHandler(
 
 const handleRegister = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { name, email, password, avatar } = req.body;
+        const { firstName, lastName, email, password, avatar } = req.body;
 
         // Check if the email is already registered
         const existingUser: IUser | null = await User.findOne({ email });
@@ -95,7 +99,7 @@ const handleRegister = asyncHandler(
 
         // Create a new user
         const newUser = new User({
-            name,
+            name: firstName + " " + lastName,
             email,
             password,
             avatar,
@@ -159,9 +163,10 @@ const handleProfileUpdate = asyncHandler(
                     message: "User not found",
                 });
             }
-
-            const imageId = user.avatar.public_id;
-            await cloudinary.uploader.destroy(imageId);
+            if (user?.avatar?.public_id) {
+                const imageId = user.avatar.public_id;
+                await cloudinary.uploader.destroy(imageId);
+            }
 
             const myCloud = await cloudinary.uploader.upload(req.body.avatar, {
                 folder: "avatars",
@@ -262,11 +267,23 @@ const handleForgotPassword = asyncHandler(
             "host"
         )}/reset-password?token=${resetToken}`;
 
-        await sendForgotPasswordEmail(
-            resetPasswordUrl,
-            user.name,
-            req.body.email
-        );
+        // await sendForgotPasswordEmail(
+        //     resetPasswordUrl,
+        //     user.name,
+        //     req.body.email
+        // );
+
+        //Send Email
+        await sendEmail({
+            data: {
+                userName: user.name,
+                resetPasswordURL: resetPasswordUrl,
+            },
+            email: user.email,
+            queue: "send-forgot-password-email",
+            subject: "Password Reset for your account",
+            template: "forgot-password.ejs",
+        });
 
         const apiResponse = new ApiResponse(
             200,
@@ -319,7 +336,7 @@ const handleLogout = asyncHandler(
             });
             return res.sendStatus(204);
         }
-        res.clearCookie("jwt", {
+        res.clearCookie("refresh_token", {
             httpOnly: true,
             sameSite: "none",
             secure: true,

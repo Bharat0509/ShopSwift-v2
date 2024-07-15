@@ -18,8 +18,7 @@ export function AccountLayout({ children }: { children: React.ReactNode }) {
                         <Avatar>
                             <AvatarImage
                                 src={
-                                    user?.avatar.url ??
-                                    "https://github.com/shadcn.png"
+                                    user?.avatar?.url 
                                 }
                                 alt='User'
                             />

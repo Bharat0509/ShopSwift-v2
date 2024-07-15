@@ -34,6 +34,7 @@ import { selectAuthObject } from "@/redux/features/authSlice";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { CustomError } from "@/lib/typing";
 
 const profileFormSchema = z.object({
     name: z
@@ -57,7 +58,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export default function Profile() {
     const { user } = useAppSelector(selectAuthObject);
 
-    const [updateProfile] = useUpdateProfileMutation();
+    const [updateProfile,{ isLoading}] = useUpdateProfileMutation();
     const [imageLoading, setImageLoading] = useState(false);
     const defaultValues: Partial<ProfileFormValues> = {
         name: user?.name ?? "user",
@@ -76,9 +77,9 @@ export default function Profile() {
         try {
             await updateProfile(profileData).unwrap();
             toast.success("Profile Updated !", { id: profileUpdateToastId });
-        } catch (error) {
+        } catch (e: unknown) {
             toast.error(
-                "An unexpected error occurred. Please try again later.",
+                (e as CustomError).data.error ?? "An unexpected error occurred. Please try again later.",
                 { id: profileUpdateToastId }
             );
         }
@@ -219,7 +220,9 @@ export default function Profile() {
                         )}
                     />
 
-                    <Button type='submit'>Update profile</Button>
+                    <Button type='submit' disabled={isLoading}>
+                        Update profile
+                    </Button>
                 </form>
             </Form>
         </main>

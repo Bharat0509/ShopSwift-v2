@@ -24,9 +24,9 @@ import {
     Sun,
     UserRound,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
 import { selectCart } from "@/redux/features/appSlice";
 
@@ -34,8 +34,22 @@ const Navbar = () => {
     const { setTheme } = useTheme();
     const { user, status } = useAppSelector(selectAuthObject);
     const { totalItems } = useAppSelector(selectCart);
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { isSuccess, data: result } = useMeQuery("user");
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const handleSearchProduct = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        // Redirect to /products with search parameters
+        navigate(
+            {
+                pathname: "/products",
+                search: `?keyword=${searchQuery}`,
+            },
+            { replace: true }
+        );
+    };
     useEffect(() => {
         if (isSuccess) {
             dispatch(authSuccess(result?.data));
@@ -95,9 +109,7 @@ const Navbar = () => {
                             <Avatar>
                                 <AvatarImage
                                     src={
-                                        user?.avatar.url ??
-                                        "https://github.com/shadcn.png"
-                                    }
+                                        user?.avatar?.url}
                                     alt='User'
                                 />
                                 <AvatarFallback>{user?.name[0]}</AvatarFallback>
@@ -127,13 +139,17 @@ const Navbar = () => {
                 </SheetContent>
             </Sheet>
             <div className='flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4 z-50'>
-                <form className='ml-auto flex-1 sm:flex-initial w-3/4'>
+                <form
+                    className='ml-auto flex-1 sm:flex-initial w-3/4'
+                    onSubmit={handleSearchProduct}
+                >
                     <div className='relative'>
                         <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
                         <Input
                             type='search'
                             placeholder='Search products...'
                             className='pl-8 font-semibold'
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                 </form>
@@ -192,11 +208,8 @@ const Navbar = () => {
                             >
                                 <Avatar className='h-8 w-8'>
                                     <AvatarImage
-                                        src={
-                                            user?.avatar.url ??
-                                            "https://github.com/shadcn.png"
-                                        }
-                                        alt='@shadcn'
+                                        src={user?.avatar?.url ?? "https://github.com/shadcn.png"}
+                                        alt='User'
                                     />
                                     <AvatarFallback>
                                         {user?.name[0].toUpperCase()}

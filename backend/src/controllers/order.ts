@@ -5,7 +5,7 @@ import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
 import mongoose from "mongoose";
-import { sendOrderPlacedEmail } from "../emailTemplates";
+import { sendEmail, sendOrderPlacedEmail } from "../emailTemplates";
 
 // Create New Order
 export const newOrder = asyncHandler(
@@ -41,7 +41,16 @@ export const newOrder = asyncHandler(
             totalPrice: orderInfo.orderTotalPayable,
             deliveredAt: threeDaysFromNow,
         });
-        await sendOrderPlacedEmail(order, req?.user?.email);
+
+        console.log(order);
+        //Send Email
+        await sendEmail({
+            data: { order },
+            email: "bhartbhammar3336@gmail.com",
+            queue: "send-order-placed-email",
+            subject: "Your Order Placed Successfully",
+            template: "order-confirm.html",
+        });
 
         const apiResponse = new ApiResponse(
             200,

@@ -127,7 +127,9 @@ export default function Cart() {
                             <p className='text-sm text-muted-foreground'>
                                 You can start adding products from shop page .
                             </p>
-                            <Button className='mt-4'>Add Product</Button>
+                            <Link to='/products'>
+                                <Button className='mt-4'>Add Product</Button>
+                            </Link>
                         </div>
                     )}
                     {totalItems > 0 && (

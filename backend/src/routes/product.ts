@@ -6,6 +6,7 @@ import {
     deleteProductReview,
     getAdminProducts,
     getAllProducts,
+    getAllSearchProducts,
     getProductDetails,
     getProductReviews,
     updateProduct,
@@ -16,6 +17,7 @@ import { authorizeRoles } from "../middleware/authorizeRoles";
 const router: Router = express.Router();
 
 router.route("/products").get(getAllProducts);
+router.route("/products/search").get(getAllSearchProducts);
 
 router
     .route("/admin/products")

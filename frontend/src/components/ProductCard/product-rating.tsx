@@ -7,9 +7,12 @@ const ProductRating = ({ ratings }: { ratings: number }) => {
     return (
         <>
             <Rating
+                readonly
                 initialRating={ratings}
                 emptySymbol={<Star />}
-                fullSymbol={<Star fill='#FFD700' />}
+                fullSymbol={<Star fill='#FFD700' />
+                
+            }
             />
         </>
     );

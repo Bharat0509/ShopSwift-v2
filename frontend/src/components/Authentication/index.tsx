@@ -6,7 +6,10 @@ import {
 } from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
-import { useLoginMutation } from "@/redux/features/authApiSlice";
+import {
+    useLoginMutation,
+    useRegisterMutation,
+} from "@/redux/features/authApiSlice";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -23,6 +26,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CustomError } from "@/lib/typing";
 
 const schema = z.object({
     firstName: z.string().min(2).max(50).optional(),
@@ -37,7 +41,8 @@ const Authentication = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
-    const [login, { isLoading }] = useLoginMutation();
+    const [login, { isLoading: isLoginLoading }] = useLoginMutation();
+    const [register, { isLoading: isRegisterLoading }] = useRegisterMutation();
 
     const { status, user, loading } = useAppSelector(selectAuthObject);
 
@@ -53,13 +58,22 @@ const Authentication = () => {
 
     const onSubmit: SubmitHandler<FormSchema> = async (userData) => {
         dispatch(authRequest());
+
         try {
-            const result = await login(userData).unwrap();
-            console.log(result);
+            let result = null;
+            if (isRegister) {
+                result = await register(userData).unwrap();
+                setIsRegister(false);
+            } else {
+                result = await login(userData).unwrap();
+            }
 
             dispatch(authSuccess(result?.data));
         } catch (e: unknown) {
-            const errorMsg = (e as Error)?.message ?? "Something went wrong.";
+            const errorMsg =
+                (e as CustomError).data.error ??
+                (e as Error)?.message ??
+                "Something went wrong.";
             toast.error(errorMsg);
             dispatch(authFailure(errorMsg));
         }
@@ -76,7 +90,7 @@ const Authentication = () => {
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className='flex items-center justify-center py-6 border border-muted px-12  bg-white dark:bg-black/50  rounded-xl'
+                        className='flex items-center justify-center mx-4 md:mx-0 py-6 border border-muted px-12  bg-white dark:bg-black/50  rounded-xl'
                     >
                         <div className='mx-auto grid w-[350px] gap-6'>
                             <div className='grid gap-2 text-center'>
@@ -178,10 +192,13 @@ const Authentication = () => {
                                 <Button
                                     type='submit'
                                     className='w-full'
-                                    disabled={isLoading}
+                                    disabled={
+                                        isLoginLoading || isRegisterLoading
+                                    }
                                 >
                                     {isRegister ? "Sign Up" : "Login"}
                                 </Button>
+
                                 <Button
                                     variant='outline'
                                     disabled
@@ -191,6 +208,7 @@ const Authentication = () => {
                                         ? "Sign up with Google"
                                         : "Login with Google"}
                                 </Button>
+
                                 <div className='text-center text-sm'>
                                     Don&apos;t have an account?{" "}
                                     <Button
@@ -208,12 +226,13 @@ const Authentication = () => {
                     </form>
                 </Form>
             </div>
-            <div className='hidden bg-muted lg:block z-0'>
+            <div className='relative hidden bg-muted lg:block z-0'>
                 <img
-                    src='/placeholder.svg'
+                    src='/login_placeholder.jpg'
                     alt='Image'
-                    className='h-screen w-full object-cover dark:brightness-[0.2] dark:grayscale -z-10'
+                    className='h-screen w-full object-cover opacity-80'
                 />
+                <div className='absolute inset-0 bg-gradient-to-r from-[#f5f5f4]  dark:from-[#292524] via-transparent dark:via-[#292524]/60  to-transparent dark:to-[#292524]/25'></div>
             </div>
         </div>
     );

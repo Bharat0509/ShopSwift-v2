@@ -1,15 +1,15 @@
-import { useAppDispatch } from "@/redux/hooks";
-import { useEffect } from "react";
+import { useLogoutQuery } from "@/redux/features/authApiSlice";
+import { logOut } from "@/redux/features/authSlice";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const LogOut = () => {
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    useEffect(() => {
-        // dispatch(logOutUser());
-        navigate("/", { replace: true });
-    }, [dispatch, navigate]);
-    return <div className=''>Logging Out...</div>;
+    const dispatch = useDispatch();
+    useLogoutQuery({});
+    dispatch(logOut());
+    navigate("/", { replace: true });
+    return null;
 };
 
 export default LogOut;

@@ -22,6 +22,7 @@ import PlaceOrder from "./components/Cart/PlaceOrder";
 import WrapperScrollToTop from "./components/ui/scrollToTop";
 import ProcessPayment from "./components/Cart/ProcessPayment";
 import ProcessPaymentSuccess from "./components/Cart/ProcessPaymentSuccess";
+import { UpdateProduct } from "./components/Dashboard/Products/Edit";
 
 function App() {
     return (
@@ -44,6 +45,7 @@ function App() {
                         path='/products/:productId'
                         element={<ProductInfo />}
                     />
+
                     <Route path='/account' element={<AuthenticatedOutlet />}>
                         <Route index element={<Profile />} />
                         <Route path='cart' element={<Cart />} />
@@ -66,6 +68,7 @@ function App() {
                             element={<ProductsDashboard />}
                         />
                         <Route path='products/add' element={<AddProduct />} />
+                        <Route path='products/:id/edit' element={<UpdateProduct />} />
                         <Route path='orders' element={<OrdersDashboard />} />
                         <Route path='orders/:orderId' element={<Order />} />
                     </Route>

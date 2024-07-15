@@ -39,18 +39,24 @@ export function ForgotPassword() {
     // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            await sendForgotPasswordEmail(values.email);
-            toast.success("Email sent...");
+            await sendForgotPasswordEmail(values.email).unwrap();
+
+            toast.success("Email sent successfully.");
             setCurrTab("resend-forgot-password");
         } catch (error) {
+            console.log(error);
             toast.error("Fail to send reset password email. Please try again.");
         }
     }
     return (
-        <main className='h-[75vh] w-screen fixed flex items-center justify-center'>
+        <main className='h-[calc(100vh-8rem)] w-screen flex m-auto items-center justify-center'>
             {currTab === "forgot-password" ? (
-                <Card className='w-full max-w-sm'>
+                <Card className='w-full max-w-md'>
                     <CardHeader>
+                        <img
+                            src='/forgot_password.png'
+                            className='h-52 w-52 mx-auto object-cover'
+                        />
                         <CardTitle className='text-2xl'>
                             Forgot Password
                         </CardTitle>
@@ -92,16 +98,20 @@ export function ForgotPassword() {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className='w-full max-w-sm'>
+                <Card className='w-full max-w-md'>
                     <CardHeader>
-                        <CardTitle className='text-2xl'>
-                            Forgot Password
+                        <img
+                            src='/email_sent.png'
+                            className='h-full w-full mx-auto object-cover'
+                        />
+                        <CardTitle className='text-2xl text-green-500'>
+                            Email Sent Successfully !
                         </CardTitle>
                     </CardHeader>
                     <CardContent className='grid gap-4'>
                         <p>
                             We've sent reset password email. please follow
-                            mentioned in email to reset your password. f
+                            mentioned in email to reset your password.
                         </p>
                         <Form {...form}>
                             <form

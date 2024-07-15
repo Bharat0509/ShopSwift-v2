@@ -24,6 +24,21 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: ({ data }) => data,
         }),
+        getProductById: builder.query({
+            query: ({productId}) => ({
+                url: `/api/v1/products/${productId}`,
+                method: "GET",
+            }),
+            transformResponse: ({ data }) => data,
+        }),
+
+        getDashboardData: builder.query({
+            query: () => ({
+                url: "/api/v1/dashboard",
+                method: "GET",
+            }),
+            transformResponse: ({ data }) => data,
+        }),
         addProduct: builder.mutation({
             query: (productData) => ({
                 url: "/api/v1/admin/products/add",
@@ -37,6 +52,8 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetAdminOrdersQuery,
     useGetAdminProductsQuery,
+    useGetProductByIdQuery,
     useAddProductMutation,
     useAdminUpdateOrderMutation,
+    useGetDashboardDataQuery,
 } = dashboardApiSlice;

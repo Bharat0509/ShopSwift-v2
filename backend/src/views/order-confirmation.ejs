@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f6f6f6;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px;
+      background-color: #ea580c;
+      color: #ffffff;
+    }
+
+    .content {
+      margin: 20px 0;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #ea580c;
+      color: #ffffff;
+    }
+
+    .table-container {
+      width: 100%;
+      margin: 20px 0;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      background-color: #ea580c;
+      color: #ffffff;
+      text-align: left;
+      padding: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background-color: #ea580c;
+      color: #ffffff;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #ffffff;
+      background-color: #FF4500;
+      text-decoration: none;
+      border-radius: 5px;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .button:hover {
+      background-color: #e03c00;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Your Order is Confirmed!</h1>
+      <p>Thank you for shopping with us.</p>
+    </div>
+    <div class="content">
+      <p>Hi <%= order.user %>,</p>
+      <div class="table-container">
+        <div class="table-header">Here's what you ordered:</div>
+        <table>
+          <tr>
+            <td>Order #: <%= order._id %>
+            </td>
+            <td>Order Arriving Date: <%= order.deliveredAt %>
+            </td>
+          </tr>
+          <tr>
+            <td>Payment ID #: <%= order.paymentInfo._id %>
+            </td>
+            <td>Payment Status: <%= order.paymentInfo.status %>
+            </td>
+          </tr>
+          <tr>
+            <th>ITEM</th>
+            <th>QTY</th>
+            <th>COST</th>
+          </tr>
+          <% order.orderItems.forEach(item=> { %>
+            <tr>
+              <td>
+                <%= item.name %>
+              </td>
+              <td>
+                <%= item.quantity %>
+              </td>
+              <td>$<%= (item.price * item.quantity).toFixed(2) %>
+              </td>
+            </tr>
+            <% }); %>
+              <tr>
+                <td><strong>Subtotal:</strong></td>
+                <td></td>
+                <td>$<%= order.itemsPrice %>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Total:</strong></td>
+                <td></td>
+                <td>$<%= order.totalPrice %>
+                </td>
+              </tr>
+        </table>
+      </div>
+    </div>
+    <div class="footer">
+      <p>If you have any questions, please contact our support team at <a href="mailto:support@shopswift.com"
+          style="color: #ffffff;">support@shopswift.com</a></p>
+      <p>© 2024 ShopSwift. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -49,14 +49,9 @@ const userSchema = new mongoose.Schema<IUser>(
         avatar: {
             public_id: {
                 type: String,
-                required: [
-                    true,
-                    "Please provide the public ID for your avatar.",
-                ],
             },
             url: {
                 type: String,
-                required: [true, "Please provide the URL for your avatar."],
             },
         },
         role: {

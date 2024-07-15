@@ -124,7 +124,7 @@ export default function ProductsDashboard() {
                                 <TableHead>Status</TableHead>
                                 <TableHead>Price</TableHead>
                                 <TableHead className='hidden md:table-cell'>
-                                    Total Sales
+                                    Available Stock
                                 </TableHead>
                                 <TableHead className='hidden md:table-cell '>
                                     Created at
@@ -185,7 +185,7 @@ export default function ProductsDashboard() {
                                                 <DropdownMenuItem>
                                                     <Link
                                                         className='w-full flex items-center gap-2'
-                                                        to={`/products/${product._id}/edit`}
+                                                        to={`/dashboard/products/${product._id}/edit`}
                                                     >
                                                         <Pencil size={16} />{" "}
                                                         Edit
@@ -194,7 +194,7 @@ export default function ProductsDashboard() {
                                                 <DropdownMenuItem>
                                                     <Link
                                                         className='w-full flex items-center gap-2'
-                                                        to={`/products/${product?._id}/delete`}
+                                                        to={`/dashboard/products/${product?._id}/delete`}
                                                     >
                                                         <Trash2 size={16} />{" "}
                                                         Delete

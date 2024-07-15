@@ -107,3 +107,9 @@ export interface IApiError {
     success: boolean;
     errors: unknown;
 }
+export interface CustomError{
+    status:string,
+    data:{
+        error:string
+    }
+}

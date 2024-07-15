@@ -77,6 +77,21 @@ export const getAllProducts = asyncHandler(
     }
 );
 
+// Get query Products
+export const getAllSearchProducts = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const data= await fetch(
+            `http://15.207.16.130:5000/search?query=${req.query.keyword}`
+        ).then(res=>res.json());
+        const apiResponse = new ApiResponse(
+            200,
+            {  products:data },
+            "Products fetched successfully"
+        );
+        res.status(apiResponse.statusCode).json(apiResponse);
+    }
+);
+
 // Get all Products ADMIN
 export const getAdminProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {

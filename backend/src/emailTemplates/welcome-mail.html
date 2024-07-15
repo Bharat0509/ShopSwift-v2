@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to ShopSwift!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background-color: #ea580c;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .logo {
+      display: block;
+      margin: 20px auto;
+      width: 80px;
+    }
+
+    .content {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .content h2 {
+      color: #ea580c;
+      font-size: 24px;
+      margin-top: 0;
+    }
+
+    .content p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .button {
+      display: inline-block;
+      background-color: #ea580c;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 5px;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #c74909;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #f4f4f4;
+      color: #666666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to ShopSwift!</h1>
+    </div>
+    <div class="content">
+      <img src="https://example.com/shopswift-logo.png" alt="ShopSwift Logo" class="logo">
+      <h2>Your Ultimate Destination for Online Shopping</h2>
+      <p>Hi <%= username %>,</p>
+      <p>Welcome to ShopSwift! We're thrilled to have you join our community of smart shoppers. Discover a world of
+        quality products, exclusive offers, and seamless shopping experiences.</p>
+      <a href="http://shopswift.com" class="button">Start Shopping Now</a>
+      <p>If you have any questions, please contact our support team at <a
+          href="mailto:support@example.com">support@example.com</a></p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2024 ShopSwift. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+
+</html>

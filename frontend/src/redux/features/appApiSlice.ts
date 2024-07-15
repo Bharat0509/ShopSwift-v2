@@ -26,6 +26,13 @@ export const appApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: ({ data }) => data,
         }),
+        getSearchProducts: builder.query({
+            query: ({ searchQueryUrl }) => ({
+                url: searchQueryUrl,
+                method: "GET",
+            }),
+            transformResponse: ({ data }) => data,
+        }),
         getProductsById: builder.query({
             query: ({ productId }) => ({
                 url: `/api/v1/products/${productId}`,
@@ -66,5 +73,6 @@ export const {
     useGetProductsByIdQuery,
     useGetMyOrderQuery,
     useGetPublishableKeyQuery,
+    useGetSearchProductsQuery,
     useGetPaymentIntentMutation,
 } = appApiSlice;

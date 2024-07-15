@@ -34,14 +34,48 @@ import user from "./routes/user";
 import product from "./routes/product";
 import order from "./routes/order";
 import payment from "./routes/payment";
+import dashboard from "./routes/dashboard";
+import path from "path";
 
 // Error Handler Middleware
 import errorHandlerMiddleware from "./middleware/errorHandler";
+
+// ====================================
+// Define a route to render the order confirmation page
+
+// Set the view engine to EJS
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/order-confirmation", (req, res) => {
+    const order = {
+        user: "John Doe1",
+        _id: "12345",
+        deliveredAt: "2024-07-15",
+        paymentInfo: {
+            _id: "abc123",
+            status: "Paid",
+        },
+        orderItems: [
+            { name: "Product 1", quantity: 2, price: 19.99 },
+            { name: "Product 2", quantity: 1, price: 39.99 },
+        ],
+        itemsPrice: 79.97,
+        totalPrice: 84.97,
+    };
+
+    res.render("order-confirmation", { order });
+});
+// ====================================
 
 app.use("/api/v1", user);
 app.use("/api/v1", product);
 app.use("/api/v1", order);
 app.use("/api/v1", payment);
+app.use("/api/v1", dashboard);
 
 app.use(errorHandlerMiddleware);
 

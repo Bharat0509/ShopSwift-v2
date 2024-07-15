@@ -9,6 +9,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 body: { ...credentials },
             }),
         }),
+        register: builder.mutation({
+            query: (credentials) => ({
+                url: "/api/v1/register",
+                method: "POST",
+                body: { ...credentials },
+            }),
+        }),
         updateProfile: builder.mutation({
             query: (profileData) => ({
                 url: "/api/v1/me/update",
@@ -36,13 +43,21 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method: "GET",
             }),
         }),
+        logout: builder.query({
+            query: () => ({
+                url: "/api/v1/logout",
+                method: "GET",
+            }),
+        }),
     }),
 });
 
 export const {
     useLoginMutation,
+    useRegisterMutation,
     useMeQuery,
     useUpdateProfileMutation,
     useSendForgotPasswordEmailMutation,
     useResetPasswordMutation,
+    useLogoutQuery,
 } = authApiSlice;

@@ -5,7 +5,7 @@ import { useGetProductsQuery } from "@/redux/features/appApiSlice";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Filter, Star } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ProductCard } from "../ProductCard/product-card";
 import {
     Breadcrumb,
@@ -20,6 +20,7 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
+import Spinner from "../ui/spinner";
 
 const categories = [
     { id: "all", label: "All" },
@@ -50,17 +51,25 @@ const categories = [
 ] as const;
 
 export function Shop() {
+    const [searchParams] = useSearchParams();
+
+    // Convert search params (query string) to an object
+    const queryParams: { [key: string]: string } = {};
+    searchParams.forEach((value, key) => {
+        queryParams[key] = value;
+    });
+
     const [filters, setFilters] = useState({
-        rating: 1,
-        categories: "",
-        sort: 0,
+        rating: queryParams?.rating ?? 1,
+        categories: queryParams?.category ?? "",
+        sort: queryParams?.sortBy ?? 0,
     });
 
     let products: IProduct[] = [];
 
-    const { data: result } = useGetProductsQuery(
+    const { data: result, isLoading } = useGetProductsQuery(
         {
-            searchQueryUrl: `/api/v1/products?category=${filters.categories}&rating[gte]=${filters.rating}`,
+            searchQueryUrl: `/api/v1/products?keyword=${queryParams.keyword}&category=${filters.categories}&rating[gte]=${filters.rating}`,
         },
         {
             refetchOnFocus: true,
@@ -136,7 +145,7 @@ export function Shop() {
                                     onValueChange={(val) => {
                                         setFilters((prev) => ({
                                             ...prev,
-                                            rating: parseInt(val),
+                                            rating: val,
                                         }));
                                     }}
                                     className='flex flex-col space-y-1'
@@ -302,17 +311,30 @@ export function Shop() {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </header>
-                <main className='flex items-center justify-center w-full  p-2 md:p-4 overflow-scroll'>
+                <main className='flex items-center  w-full  p-2 md:p-4 overflow-scroll'>
                     <div className='flex gap-2 flex-wrap overflow-scroll space gap-y-8 h-[85vh] pb-20'>
-                        {(products || []).map((product) => (
-                            <ProductCard
-                                key={product._id}
-                                product={product}
-                                className='w-[150px] sm:w-[200px] md:w-[200px] lg:w-[225px]'
-                                width={300}
-                                height={300}
-                            />
-                        ))}
+                        {products?.length ? (
+                            products.map((product) => (
+                                <ProductCard
+                                    key={product._id}
+                                    product={product}
+                                    className='w-[150px] sm:w-[200px] md:w-[200px] lg:w-[225px]'
+                                    width={300}
+                                    height={300}
+                                />
+                            ))
+                        ) : isLoading ? (
+                            <div className='w-[80vw] h-full m-auto'>
+                                <Spinner />
+                            </div>
+                        ) : (
+                            <>
+                                {" "}
+                                <p className='w-screen md:w-[80vw] h-[10rem] md:h-[20rem] m-auto flex items-center justify-center'>
+                                    No Products Available
+                                </p>
+                            </>
+                        )}
                     </div>
                 </main>
             </div>
