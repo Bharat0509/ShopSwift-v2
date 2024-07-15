@@ -34,11 +34,54 @@ import {
     BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { useGetDashboardDataQuery } from "@/redux/features/dashboardApiSlice";
+// Define interfaces for the data structures
+interface IDashboardData {
+    currentMonth: {
+        totalProducts: number;
+        totalOrders: number;
+        totalUsers: number;
+        activeOrders: number;
+        revenue: string;
+    };
+    previousMonth: {
+        revenue: string;
+    };
+    last10Orders: Order[];
+    top10Products: Product[];
+    percentageIncrease: number;
+}
+
+interface Order {
+    // Define the structure of an Order
+    id: string;
+    product: string;
+    quantity: number;
+    status: string;
+    totalPrice: string;
+    userDetails: {
+        name: string;
+        email: string;
+        avatar: {
+            image: string;
+            public_id?: string;
+        };
+    };
+    // Add other relevant fields
+}
+
+interface Product {
+    // Define the structure of a Product
+    id: string;
+    name: string;
+    price: number;
+    // Add other relevant fields
+}
 
 export function Dashboard() {
     const { data } = useGetDashboardDataQuery({});
-    const currMonth = data?.dashboardData?.currentMonth;
-    const lastOrders = data?.dashboardData?.last10Orders;
+    const currMonth = (data?.dashboardData as IDashboardData)?.currentMonth;
+    const lastOrders: Order[] = (data?.dashboardData as IDashboardData)
+        ?.last10Orders;
 
     return (
         <main className='flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8'>
@@ -158,7 +201,7 @@ export function Dashboard() {
                             </TableHeader>
                             <TableBody className='h-[10rem] overflow-scroll'>
                                 {lastOrders &&
-                                    lastOrders.map((order: unknown) => (
+                                    lastOrders.map((order: Order) => (
                                         <TableRow>
                                             <TableCell>
                                                 <div className='font-medium'>

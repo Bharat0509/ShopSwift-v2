@@ -37,7 +37,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { useAddProductMutation, useGetProductByIdQuery } from "@/redux/features/dashboardApiSlice";
 import { ChevronLeft, PlusCircle, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -58,7 +58,10 @@ const schema = z.object({
 });
 
 type FormSchema = z.infer<typeof schema>;
-
+type IImage={
+    url:string,
+    public_id:string
+}
 export function UpdateProduct() {
    const params=useParams()
   
@@ -66,7 +69,7 @@ export function UpdateProduct() {
     
     const product=data?.product;
     
-    const [imagesPreview, setImagesPreview] = useState<string[]>(product?.images?.map(e=>e?.url) ?? []);
+    const [imagesPreview, setImagesPreview] = useState<string[]>((product?.images as IImage[])?.map(e=>e?.url) ?? []);
     const [currImagesPreviewIdx, setCurrImagesPreviewIdx] = useState<number>(0);
 
     const defaultValues: Partial<FormSchema> = {
