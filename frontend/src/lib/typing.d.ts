@@ -12,6 +12,7 @@ export interface IProduct {
     user: string;
     __v: number;
     _id: string;
+    recommendedProducts?:IProduct
 }
 
 export interface IOrder {

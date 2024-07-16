@@ -11,6 +11,7 @@ import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
 import * as dotenv from "dotenv";
+import { PRIORITY_LIMIT } from "bullmq";
 dotenv.config();
 // Define a custom property on the Request object to store decoded user information
 declare global {
@@ -263,9 +264,7 @@ const handleForgotPassword = asyncHandler(
 
         // Construct reset password URL
 
-        const resetPasswordUrl = `${req.protocol}://${req.get(
-            "host"
-        )}/reset-password?token=${resetToken}`;
+        const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
         // await sendForgotPasswordEmail(
         //     resetPasswordUrl,

@@ -34,12 +34,16 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { IProduct } from "@/lib/typing";
-import { useGetAdminProductsQuery } from "@/redux/features/dashboardApiSlice";
+import {  useAdminDeleteProductMutation,useGetAdminProductsQuery } from "@/redux/features/dashboardApiSlice";
 import { Link } from "react-router-dom";
 
 export default function ProductsDashboard() {
     const { data, isLoading } = useGetAdminProductsQuery("dashboard-orders");
-
+    const [deleteProduct]=useAdminDeleteProductMutation()
+    const handleProductDelete=async (productId:string)=>{
+       
+            await deleteProduct({ productId});
+    }
     return (
         <Card>
             <CardHeader>
@@ -192,13 +196,17 @@ export default function ProductsDashboard() {
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
-                                                    <Link
+                                                    <Button
                                                         className='w-full flex items-center gap-2'
-                                                        to={`/dashboard/products/${product?._id}/delete`}
+                                                        onClick={() =>
+                                                            handleProductDelete(
+                                                                product?._id
+                                                            )
+                                                        }
                                                     >
                                                         <Trash2 size={16} />{" "}
                                                         Delete
-                                                    </Link>
+                                                    </Button>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

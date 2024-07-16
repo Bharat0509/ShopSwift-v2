@@ -25,14 +25,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetMyOrderQuery } from "@/redux/features/appApiSlice";
-import { useAdminUpdateOrderMutation } from "@/redux/features/dashboardApiSlice";
+import { useUpdateOrderMutation } from "@/redux/features/dashboardApiSlice";
 import { toast } from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
 export default function Order() {
     const params = useParams();
     const orderId = params.orderId as string;
-    const [updateOrder] = useAdminUpdateOrderMutation();
+    const [updateOrder] = useUpdateOrderMutation();
 
     const { isSuccess, data } = useGetMyOrderQuery({ orderId });
     const order = data?.order;

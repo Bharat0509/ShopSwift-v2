@@ -19,9 +19,12 @@ export function ProductCard({
     className,
 }: ProductCardProps) {
     return (
-        <Link to={`/products/${product._id}`}>
+        <Link
+            to={`/products/${product._id}`}
+            className={cn([className])}
+        >
             <Card
-                className={cn(["p-0 h-fit border-none shadow-none", className])}
+                className={cn(["p-0 h-fit border-none shadow-none"])}
             >
                 <CardHeader className='p-0.5'>
                     <img

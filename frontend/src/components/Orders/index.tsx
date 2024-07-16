@@ -13,7 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { IOrder } from "@/lib/typing";
+import { CustomError, IOrder } from "@/lib/typing";
 import { cn } from "@/lib/utils";
 import { useGetMyOrdersQuery } from "@/redux/features/appApiSlice";
 import { toast } from "react-hot-toast";
@@ -36,17 +36,47 @@ import {
     DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { useEffect } from "react";
 
 export default function Component() {
-    const { isLoading, data, error } = useGetMyOrdersQuery({
+    const { isLoading, data, error, refetch } = useGetMyOrdersQuery({
         refetchOnFocus: true,
         pollingInterval: 500,
     });
+    // const { isLoading, data, error } = useGetMyOrdersQuery({
+    //     refetchOnFocus: true,
+    //     pollingInterval: 500,
+    // });
+    // const result = data as { orders: IOrder[] };
+    // if (error) {
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     //@ts-expect-error
+    //     toast.error(error?.data?.error ?? "Failed to fetch orders.");
+    // }
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                refetch();
+            }
+        };
+
+        window.addEventListener("focus", refetch);
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener("focus", refetch);
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            );
+        };
+    }, [refetch]);
+
     const result = data as { orders: IOrder[] };
     if (error) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-expect-error
-        toast.error(error?.data?.error ?? "Failed to fetch orders.");
+        toast.error(
+            (error as CustomError)?.data?.error ?? "Failed to fetch orders."
+        );
     }
     return (
         <Card>
@@ -147,11 +177,17 @@ export default function Component() {
                                                 className={cn([
                                                     "text-xs",
                                                     order.orderStatus ===
-                                                        "Delivered" &&
-                                                        "bg-green-600",
+                                                        "delivered" &&
+                                                        "bg-green-800",
                                                     order.orderStatus ===
-                                                        "Processing" &&
-                                                        "bg-zinc-600",
+                                                        "shipped" &&
+                                                        "bg-orange-500",
+                                                    order.orderStatus ===
+                                                        "processing" &&
+                                                        "bg-zinc-200",
+                                                    order.orderStatus ===
+                                                        "canceled" &&
+                                                        "bg-red-800",
                                                 ])}
                                                 variant='secondary'
                                             >

@@ -19,7 +19,7 @@ import { useResetPasswordMutation } from "@/redux/features/authApiSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -34,6 +34,7 @@ export function ResetPassword() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
     });
+    const navigate=useNavigate()
 
     const location = useLocation();
 
@@ -43,12 +44,13 @@ export function ResetPassword() {
     // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            console.log(values);
+    
             await resetPassword({
                 password: values.password,
                 token: query?.get("token"),
             });
             toast.success("Password reset successful.");
+            navigate("/auth")
         } catch (error) {
             toast.error("Fail to send reset password. Please try again.");
         }

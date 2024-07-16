@@ -9,7 +9,7 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: ({ data }) => data,
         }),
-        adminUpdateOrder: builder.mutation({
+        updateOrder: builder.mutation({
             query: ({ orderId, updatedOrder }) => ({
                 url: `/api/v1/admin/orders/${orderId}`,
                 method: "PUT",
@@ -17,6 +17,22 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: ({ data }) => data,
         }),
+        updateProduct: builder.mutation({
+            query: ({ productId, updatedProduct }) => ({
+                url: `/api/v1/admin/product/${productId}`,
+                method: "PUT",
+                body: updatedProduct,
+            }),
+            transformResponse: ({ data }) => data,
+        }),
+        adminDeleteProduct: builder.mutation({
+            query: ({ productId }) => ({
+                url: `/api/v1/admin/products/${productId}/delete`,
+                method: "DELETE",
+            }),
+            transformResponse: ({ data }) => data,
+        }),
+
         getAdminProducts: builder.query({
             query: () => ({
                 url: "/api/v1/admin/products",
@@ -25,7 +41,7 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
             transformResponse: ({ data }) => data,
         }),
         getProductById: builder.query({
-            query: ({productId}) => ({
+            query: ({ productId }) => ({
                 url: `/api/v1/products/${productId}`,
                 method: "GET",
             }),
@@ -53,7 +69,9 @@ export const {
     useGetAdminOrdersQuery,
     useGetAdminProductsQuery,
     useGetProductByIdQuery,
+    useUpdateProductMutation,
     useAddProductMutation,
-    useAdminUpdateOrderMutation,
+    useUpdateOrderMutation,
+    useAdminDeleteProductMutation,
     useGetDashboardDataQuery,
 } = dashboardApiSlice;

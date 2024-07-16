@@ -1,4 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useGetProductsByIdQuery } from "@/redux/features/appApiSlice";
+import { addToCart } from "@/redux/features/appSlice";
+import { useAppDispatch } from "@/redux/hooks";
+import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -12,13 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ICartItem, IProduct } from "@/lib/typing";
 import { cn } from "@/lib/utils";
-import { useGetProductsByIdQuery } from "@/redux/features/appApiSlice";
-import { addToCart } from "@/redux/features/appSlice";
-import { useAppDispatch } from "@/redux/hooks";
 import { StarIcon } from "lucide-react";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { Link, useParams } from "react-router-dom";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -29,16 +28,20 @@ import {
 } from "../ui/breadcrumb";
 import { Skeleton } from "../ui/skeleton";
 import ProductRating from "../ProductCard/product-rating";
+import { ProductCard } from "../ProductCard/product-card";
 
-export default function ProductInfo() {
+const ProductInfo = () => {
     const param = useParams();
     const [currPreviewImgIdx, setCurrPreviewImgIdx] = useState<number>(0);
     const dispatch = useAppDispatch();
-    const { isLoading, data, isError } = useGetProductsByIdQuery({
+    const { isLoading, data } = useGetProductsByIdQuery({
         productId: param.productId,
     });
     const [productCartQty, setProductCartQty] = useState<number>(1);
+    const [activeTab, setActiveTab] = useState<string>("description");
     const product: IProduct = data?.product;
+    const recommendedProducts: IProduct[] = data?.recommendedProducts;
+
     const handleAddToCart = (e: React.FormEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
@@ -53,6 +56,7 @@ export default function ProductInfo() {
         dispatch(addToCart(productToAdd));
         toast.success("Item added to cart!");
     };
+
     return (
         <>
             <main>
@@ -99,7 +103,7 @@ export default function ProductInfo() {
                                     >
                                         <img
                                             alt='Preview thumbnail'
-                                            className='aspect-square  object-cover'
+                                            className='aspect-square object-cover'
                                             height='120'
                                             src={img?.url}
                                             width='120'
@@ -112,29 +116,24 @@ export default function ProductInfo() {
                             </div>
                             <div className='md:col-span-4'>
                                 {isLoading ? (
-                                    <>
-                                        <img
-                                            alt='Product Image'
-                                            className='aspect-[2/3] animate-pulse h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
-                                            height='400'
-                                            src='/placeholder.svg'
-                                            width='600'
-                                        />
-                                    </>
+                                    <img
+                                        alt='Product Image'
+                                        className='aspect-[2/3] animate-pulse h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
+                                        height='400'
+                                        src='/placeholder.svg'
+                                        width='600'
+                                    />
                                 ) : (
-                                    <>
-                                        <img
-                                            alt='Product Image'
-                                            className='aspect-[2/3] h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
-                                            height='400'
-                                            src={
-                                                product?.images[
-                                                    currPreviewImgIdx
-                                                ]?.url
-                                            }
-                                            width='600'
-                                        />
-                                    </>
+                                    <img
+                                        alt='Product Image'
+                                        className='aspect-[2/3] h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
+                                        height='400'
+                                        src={
+                                            product?.images[currPreviewImgIdx]
+                                                ?.url
+                                        }
+                                        width='600'
+                                    />
                                 )}
                             </div>
                         </div>
@@ -148,7 +147,6 @@ export default function ProductInfo() {
                                     {data.product.name}
                                 </h1>
                             )}
-
                             <div>
                                 <p>
                                     60% combed ringspun cotton/40% polyester
@@ -174,187 +172,161 @@ export default function ProductInfo() {
                                     </>
                                 )}
                             </div>
-
                             {isLoading ? (
                                 <Skeleton className='h-8 w-1/4' />
                             ) : (
-                                <>
-                                    <div className='text-4xl font-bold'>
-                                        {!isLoading && `$${product.price}`}
-                                    </div>
-                                </>
+                                <div className='text-4xl font-bold'>
+                                    {!isLoading && `$${product.price}`}
+                                </div>
                             )}
                         </div>
                         <form className='grid gap-4 md:gap-10'>
                             {isLoading ? (
                                 <Skeleton className='h-16 w-full' />
                             ) : (
-                                <>
-                                    <div className='grid gap-2'>
+                                <div className='grid gap-2'>
+                                    <Label
+                                        className='text-base'
+                                        htmlFor='color'
+                                    >
+                                        Color
+                                    </Label>
+                                    <RadioGroup
+                                        className='flex items-center gap-2'
+                                        defaultValue='black'
+                                        id='color'
+                                    >
                                         <Label
-                                            className='text-base'
-                                            htmlFor='color'
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='color-black'
                                         >
-                                            Color
+                                            <RadioGroupItem
+                                                id='color-black'
+                                                value='black'
+                                            />
+                                            Black
                                         </Label>
-                                        <RadioGroup
-                                            className='flex items-center gap-2'
-                                            defaultValue='black'
-                                            id='color'
+                                        <Label
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='color-white'
                                         >
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='color-black'
-                                            >
-                                                <RadioGroupItem
-                                                    id='color-black'
-                                                    value='black'
-                                                />
-                                                Black
-                                            </Label>
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='color-white'
-                                            >
-                                                <RadioGroupItem
-                                                    id='color-white'
-                                                    value='white'
-                                                />
-                                                White
-                                            </Label>
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='color-blue'
-                                            >
-                                                <RadioGroupItem
-                                                    id='color-blue'
-                                                    value='blue'
-                                                />
-                                                Blue
-                                            </Label>
-                                        </RadioGroup>
-                                    </div>
-                                </>
+                                            <RadioGroupItem
+                                                id='color-white'
+                                                value='white'
+                                            />
+                                            White
+                                        </Label>
+                                        <Label
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='color-blue'
+                                        >
+                                            <RadioGroupItem
+                                                id='color-blue'
+                                                value='blue'
+                                            />
+                                            Blue
+                                        </Label>
+                                    </RadioGroup>
+                                </div>
                             )}
-
                             {isLoading ? (
                                 <Skeleton className='h-16 w-full' />
                             ) : (
-                                <>
-                                    <div className='grid gap-2'>
+                                <div className='grid gap-2'>
+                                    <Label className='text-base' htmlFor='size'>
+                                        Size
+                                    </Label>
+                                    <RadioGroup
+                                        className='flex items-center gap-2'
+                                        defaultValue='m'
+                                        id='size'
+                                    >
                                         <Label
-                                            className='text-base'
-                                            htmlFor='size'
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='size-xs'
                                         >
-                                            Size
+                                            <RadioGroupItem
+                                                id='size-xs'
+                                                value='xs'
+                                            />
+                                            XS
                                         </Label>
-                                        <RadioGroup
-                                            className='flex items-center gap-2'
-                                            defaultValue='m'
-                                            id='size'
+                                        <Label
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='size-s'
                                         >
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='size-xs'
-                                            >
-                                                <RadioGroupItem
-                                                    id='size-xs'
-                                                    value='xs'
-                                                />
-                                                XS
-                                            </Label>
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='size-s'
-                                            >
-                                                <RadioGroupItem
-                                                    id='size-s'
-                                                    value='s'
-                                                />
-                                                S
-                                            </Label>
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='size-m'
-                                            >
-                                                <RadioGroupItem
-                                                    id='size-m'
-                                                    value='m'
-                                                />
-                                                M
-                                            </Label>
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='size-l'
-                                            >
-                                                <RadioGroupItem
-                                                    id='size-l'
-                                                    value='l'
-                                                />
-                                                L
-                                            </Label>
-                                            <Label
-                                                className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                                htmlFor='size-xl'
-                                            >
-                                                <RadioGroupItem
-                                                    id='size-xl'
-                                                    value='xl'
-                                                />
-                                                XL
-                                            </Label>
-                                        </RadioGroup>
-                                    </div>
-                                </>
+                                            <RadioGroupItem
+                                                id='size-s'
+                                                value='s'
+                                            />
+                                            S
+                                        </Label>
+                                        <Label
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='size-m'
+                                        >
+                                            <RadioGroupItem
+                                                id='size-m'
+                                                value='m'
+                                            />
+                                            M
+                                        </Label>
+                                        <Label
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='size-l'
+                                        >
+                                            <RadioGroupItem
+                                                id='size-l'
+                                                value='l'
+                                            />
+                                            L
+                                        </Label>
+                                        <Label
+                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                            htmlFor='size-xl'
+                                        >
+                                            <RadioGroupItem
+                                                id='size-xl'
+                                                value='xl'
+                                            />
+                                            XL
+                                        </Label>
+                                    </RadioGroup>
+                                </div>
                             )}
-
                             {isLoading ? (
-                                <Skeleton className='h-12 w-full' />
+                                <Skeleton className='h-16 w-full' />
                             ) : (
-                                <>
-                                    <div className='grid gap-2'>
-                                        <Label
-                                            className='text-base'
-                                            htmlFor='quantity'
-                                        >
-                                            Quantity
-                                        </Label>
-                                        <Select
-                                            defaultValue='1'
-                                            onValueChange={(value: string) =>
-                                                setProductCartQty(
-                                                    parseInt(value)
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger className='w-24'>
-                                                <SelectValue placeholder='Select' />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value='1'>
-                                                    1
-                                                </SelectItem>
-                                                <SelectItem value='2'>
-                                                    2
-                                                </SelectItem>
-                                                <SelectItem value='3'>
-                                                    3
-                                                </SelectItem>
-                                                <SelectItem value='4'>
-                                                    4
-                                                </SelectItem>
-                                                <SelectItem value='5'>
-                                                    5
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </>
+                                <div className='grid gap-2'>
+                                    <Label
+                                        className='text-base'
+                                        htmlFor='quantity'
+                                    >
+                                        Quantity
+                                    </Label>
+                                    <Select
+                                        defaultValue='1'
+                                        onValueChange={(e) =>
+                                            setProductCartQty(parseInt(e))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Select a quantity' />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value='1'>1</SelectItem>
+                                            <SelectItem value='2'>2</SelectItem>
+                                            <SelectItem value='3'>3</SelectItem>
+                                            <SelectItem value='4'>4</SelectItem>
+                                            <SelectItem value='5'>5</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             )}
-
                             <Button
-                                size='lg'
-                                disabled={isLoading || isError}
+                                className='bg-[#ea580c] text-white hover:bg-[#ee5c11] w-full'
+                                disabled={isLoading}
+                                type='submit'
                                 onClick={handleAddToCart}
                             >
                                 Add to cart
@@ -362,151 +334,62 @@ export default function ProductInfo() {
                         </form>
                     </div>
                 </div>
-                <div className='container px-4 mx-auto py-12'>
-                    <Separator />
-                    <div className='grid gap-8'>
-                        <div>
-                            <h2 className='text-2xl font-bold'>
-                                Product Details
+                <div className='container mx-auto my-8'>
+                    <div className='flex justify-center mb-4'>
+                        <button
+                            className={`px-4 py-2 ${
+                                activeTab === "description"
+                                    ? "border-b-2 border-primary"
+                                    : "border-b"
+                            }`}
+                            onClick={() => setActiveTab("description")}
+                        >
+                            Description
+                        </button>
+                        <button
+                            className={`px-4 py-2 ${
+                                activeTab === "reviews"
+                                    ? "border-b-2 border-primary"
+                                    : "border-b"
+                            }`}
+                            onClick={() => setActiveTab("reviews")}
+                        >
+                            Reviews
+                        </button>
+                    </div>
+                    {activeTab === "description" && (
+                        <div className='px-4'>
+                            <h2 className='text-xl font-bold mb-2'>
+                                Product Description
                             </h2>
-                            <div className='grid gap-4 mt-4 text-sm leading-loose text-gray-500 dark:text-gray-400'>
-                                <p>
-                                    Introducing the Acme Prism T-Shirt, a
-                                    perfect blend of style and comfort for the
-                                    modern individual. This tee is crafted with
-                                    a meticulous composition of 60% combed
-                                    ringspun cotton and 40% polyester jersey,
-                                    ensuring a soft and breathable fabric that
-                                    feels gentle against the skin.
-                                </p>
-                                <p>
-                                    The design of the Acme Prism T-Shirt is as
-                                    striking as it is comfortable. The shirt
-                                    features a unique prism-inspired pattern
-                                    that adds a modern and eye-catching touch to
-                                    your ensemble.
-                                </p>
-                                <p>
-                                    Whether you're running errands, hitting the
-                                    gym, or enjoying a casual weekend, the Acme
-                                    Prism T-Shirt is the perfect companion. Its
-                                    versatile design and high-quality
-                                    construction make it a wardrobe staple that
-                                    will last for seasons to come.
-                                </p>
-                            </div>
+                            <p>{product?.description}</p>
                         </div>
-                        <div>
-                            <h2 className='text-2xl font-bold'>
-                                Product Specifications
-                            </h2>
-                            <div className='grid gap-4 mt-4 text-sm leading-loose text-gray-500 dark:text-gray-400'>
-                                <div className='grid grid-cols-2 gap-4'>
-                                    <div>
-                                        <span className='font-medium'>
-                                            Material:
-                                        </span>
-                                        60% combed ringspun cotton, 40%
-                                        polyester
-                                        {"\n                          "}
-                                    </div>
-                                    <div>
-                                        <span className='font-medium'>
-                                            Fit:
-                                        </span>
-                                        Regular{"\n                          "}
-                                    </div>
-                                    <div>
-                                        <span className='font-medium'>
-                                            Sleeve Length:
-                                        </span>
-                                        Short{"\n                          "}
-                                    </div>
-                                    <div>
-                                        <span className='font-medium'>
-                                            Neckline:
-                                        </span>
-                                        Crew{"\n                          "}
-                                    </div>
-                                    <div>
-                                        <span className='font-medium'>
-                                            Care Instructions:
-                                        </span>
-                                        Machine wash cold, tumble dry low
-                                        {"\n                          "}
-                                    </div>
-                                    <div>
-                                        <span className='font-medium'>
-                                            Origin:
-                                        </span>
-                                        Made in USA
-                                        {"\n                          "}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <h2 className='text-2xl font-bold'>
+                    )}
+                    {activeTab === "reviews" && (
+                        <div className='px-4'>
+                            <h2 className='text-xl font-bold mb-2'>
                                 Customer Reviews
                             </h2>
-                            <div className='grid gap-6 mt-4'>
-                                {product.reviews.length ? (
-                                    product?.reviews?.map((review) => (
-                                        <div className='flex gap-4'>
-                                            <Avatar className='w-10 h-10 border'>
-                                                <AvatarImage
-                                                    alt='@shadcn'
-                                                    src='/placeholder-user.jpg'
-                                                />
-                                                <AvatarFallback>
-                                                    CN
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className='grid gap-2'>
-                                                <div className='flex items-center gap-4'>
-                                                    <div className='grid gap-0.5 text-sm'>
-                                                        <h3 className='font-semibold'>
-                                                            {review?.name ??
-                                                                "Sarah Johnson"}
-                                                        </h3>
-                                                        <time className='text-sm text-gray-500 dark:text-gray-400'>
-                                                            2 days ago
-                                                        </time>
-                                                    </div>
-                                                    <div className='flex items-center gap-0.5'>
-                                                        <ProductRating
-                                                            ratings={
-                                                                review?.rating ??
-                                                                0
-                                                            }
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className='text-sm leading-loose text-gray-500 dark:text-gray-400'>
-                                                    <p>
-                                                        I've been experimenting
-                                                        with my LuminaCook
-                                                        Multi-Function Air Fryer
-                                                        for a few weeks now, and
-                                                        it's been a versatile
-                                                        addition to my kitchen.
-                                                        It's great for making
-                                                        crispy fries, chicken
-                                                        wings, and even some
-                                                        healthier options.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="w-full m-auto">No Review yet..</p>
-                                )}
-                            </div>
+                            <ProductRating ratings={product?.ratings} />
                         </div>
+                    )}
+                </div>
+                <Separator className='my-6' />
+                <div className='container mx-auto my-8'>
+                    <h2 className='text-2xl font-bold mb-4'>
+                        Recommended Products
+                    </h2>
+                    <div className='flex flex-wrap gap-4'>
+                        {recommendedProducts && recommendedProducts?.map(
+                            (recommendedProduct: IProduct) => (
+                               <ProductCard product={recommendedProduct} className="w-[14rem] h-[18rem]"/>
+                            )
+                        )}
                     </div>
                 </div>
             </main>
         </>
     );
-}
+};
+
+export default ProductInfo;

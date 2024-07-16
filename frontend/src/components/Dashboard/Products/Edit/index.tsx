@@ -11,7 +11,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -24,6 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import Spinner from "@/components/ui/spinner";
 import {
     Table,
     TableBody,
@@ -35,9 +35,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
-import { useAddProductMutation, useGetProductByIdQuery } from "@/redux/features/dashboardApiSlice";
-import { ChevronLeft, PlusCircle, Upload } from "lucide-react";
-import { useState } from "react";
+import {
+    useUpdateProductMutation,
+    useGetProductByIdQuery,
+} from "@/redux/features/dashboardApiSlice";
+import { ChevronLeft } from "lucide-react";
+import { useState, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -58,40 +61,58 @@ const schema = z.object({
 });
 
 type FormSchema = z.infer<typeof schema>;
-type IImage={
-    url:string,
-    public_id:string
-}
+type IImage = {
+    url: string;
+    public_id: string;
+};
+
 export function UpdateProduct() {
-   const params=useParams()
-  
-    const {data}=useGetProductByIdQuery({productId:params.id})
-    
-    const product=data?.product;
-    
-    const [imagesPreview, setImagesPreview] = useState<string[]>((product?.images as IImage[])?.map(e=>e?.url) ?? []);
+    const params = useParams();
+    const navigate = useNavigate();
+
+    const { data, isLoading } = useGetProductByIdQuery({
+        productId: params.id,
+    });
+
+    const product = data?.product;
+
+    const [imagesPreview, setImagesPreview] = useState<string[]>(
+        (product?.images as IImage[])?.map((e) => e?.url) ?? []
+    );
     const [currImagesPreviewIdx, setCurrImagesPreviewIdx] = useState<number>(0);
 
     const defaultValues: Partial<FormSchema> = {
-        productName: product?.name ?? "Stylish Sunglasses",
-        description:
-            product?.description ??
-            "Shield your eyes with sophistication and style.",
-        status: "Draft",
-        category: product?.category ?? "Accessories",
-        subCategory: "Sunglasses",
-        price: product?.price ?? 49.99,
-        stock: product?.stock ?? 75,
-        size: "M",
+        productName: product?.name,
+        description: product?.description,
+        status: product?.status ?? "Draft",
+        category: product?.category,
+        subCategory: product?.subCategory,
+        price: product?.price,
+        stock: product?.stock,
+        size: product?.size,
     };
+
     const { register, handleSubmit, setValue, getValues } = useForm<FormSchema>(
         {
             defaultValues: defaultValues,
         }
     );
 
-    const [addProduct, result] = useAddProductMutation();
-    const navigate = useNavigate();
+    useEffect(() => {
+        if (product) {
+            setValue("productName", product.name);
+            setValue("description", product.description);
+            setValue("status", product.status as "Publish" | "Draft");
+            setValue("category", product.category);
+            setValue("subCategory", product.subCategory);
+            setValue("price", product.price);
+            setValue("stock", product.stock);
+            setValue("size", product.size);
+        }
+    }, [product, setValue]);
+
+    const [updateProduct, result] = useUpdateProductMutation();
+
     const handleProductImagesChange = (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
@@ -114,37 +135,32 @@ export function UpdateProduct() {
             reader.readAsDataURL(file);
         });
     };
+
     const onSubmit: SubmitHandler<FormSchema> = async (productDetails) => {
-        const toastId = toast.loading("Creating product...");
-        await addProduct({ ...productDetails, images: imagesPreview });
+        const toastId = toast.loading("Updating product...");
+        const updatedProduct = { ...productDetails, images: imagesPreview };
+        await updateProduct({
+            productId: params.id,
+            updatedProduct
+        });
 
         if (!result.isLoading && result.isSuccess) {
-            toast.success("Product Created", { id: toastId });
+            toast.success("Product Updated", { id: toastId });
             navigate("/dashboard/products");
         } else {
-            toast.error(`Failed to create product : ${result.error}`, {
+            toast.error(`Failed to update product : ${result.error}`, {
                 id: toastId,
             });
         }
-        // try {
-        //     const { data } = await Axios.post("/api/v1/products/new", {
-        //         ...productDetails,
-        //         images: imagesPreview,
-        //     });
-        //     toast("Success");
-        //     console.log(data);
-        // } catch (e: unknown) {
-        //     if (e instanceof AxiosError) {
-        //         toast.error(e?.response?.data?.error);
-        //     } else {
-        //         console.error("Unexpected error:", e);
-        //         toast.error(
-        //             "An unexpected error occurred. Please try again later."
-        //         );
-        //     }
-        // }
     };
-    // useEffect(()=>{},[isLoading])
+
+    if (isLoading)
+        return (
+            <div className='h-full w-full m-auto'>
+                Loading ...
+                <Spinner />
+            </div>
+        );
 
     return (
         <div className='p-4 sm:p-6'>
@@ -163,14 +179,14 @@ export function UpdateProduct() {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Add Product</BreadcrumbPage>
+                        <BreadcrumbPage>Edit Product</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
             <main className='grid flex-1 items-start gap-4 pt-1'>
                 <form
                     onSubmit={handleSubmit(onSubmit)}
-                    className='mx-auto grid  flex-1 auto-rows-max gap-4'
+                    className='mx-auto grid flex-1 auto-rows-max gap-4'
                 >
                     <div className='flex items-center gap-4'>
                         <Button
@@ -181,13 +197,15 @@ export function UpdateProduct() {
                             <ChevronLeft className='h-4 w-4' />
                             <span className='sr-only'>Back</span>
                         </Button>
-                        <h1 className='font-semibold'>Add Product</h1>
+                        <h1 className='font-semibold'>Edit Product</h1>
 
                         <div className='hidden items-center gap-2 md:ml-auto md:flex'>
                             <Button variant='outline' size='sm'>
                                 Discard
                             </Button>
-                            <Button size='sm'>Save Product</Button>
+                            <Button size='sm' type='submit'>
+                                Update Product
+                            </Button>
                         </div>
                     </div>
                     <div className='grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8'>
@@ -206,7 +224,6 @@ export function UpdateProduct() {
                                             <Label htmlFor='name'>Name</Label>
                                             <Input
                                                 className='w-full'
-                                                defaultValue='Gamer Gear Pro Controller'
                                                 {...register("productName")}
                                             />
                                         </div>
@@ -216,7 +233,6 @@ export function UpdateProduct() {
                                             </Label>
                                             <Textarea
                                                 id='description'
-                                                defaultValue='Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl nec ultricies ultricies, nunc nisl ultricies nunc, nec ultricies nunc nisl nec nunc.'
                                                 className='min-h-32'
                                                 {...register("description")}
                                             />
@@ -249,7 +265,7 @@ export function UpdateProduct() {
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell className='font-semibold'>
-                                                    GGPC-001
+                                                    {product?.sku ?? "GGPC-001"}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Label
@@ -261,7 +277,6 @@ export function UpdateProduct() {
                                                     <Input
                                                         id='stock-1'
                                                         type='number'
-                                                        defaultValue='100'
                                                         {...register("stock")}
                                                     />
                                                 </TableCell>
@@ -275,7 +290,6 @@ export function UpdateProduct() {
                                                     <Input
                                                         id='price-1'
                                                         type='number'
-                                                        defaultValue='99.99'
                                                         {...register("price")}
                                                     />
                                                 </TableCell>
@@ -295,14 +309,14 @@ export function UpdateProduct() {
                                                             )
                                                         }
                                                     >
-                                                        <ToggleGroupItem value='s'>
-                                                            S
-                                                        </ToggleGroupItem>
-                                                        <ToggleGroupItem value='m'>
+                                                        <ToggleGroupItem value='M'>
                                                             M
                                                         </ToggleGroupItem>
-                                                        <ToggleGroupItem value='l'>
+                                                        <ToggleGroupItem value='L'>
                                                             L
+                                                        </ToggleGroupItem>
+                                                        <ToggleGroupItem value='XL'>
+                                                            XL
                                                         </ToggleGroupItem>
                                                     </ToggleGroup>
                                                 </TableCell>
@@ -310,201 +324,152 @@ export function UpdateProduct() {
                                         </TableBody>
                                     </Table>
                                 </CardContent>
-                                <CardFooter className='justify-center border-t p-4'>
-                                    <Button
-                                        size='sm'
-                                        variant='ghost'
-                                        className='gap-1'
-                                    >
-                                        <PlusCircle className='h-3.5 w-3.5' />
-                                        Add Variant
-                                    </Button>
-                                </CardFooter>
-                            </Card>
-                            <Card x-chunk='dashboard-07-chunk-2'>
-                                <CardHeader>
-                                    <CardTitle>Product Category</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='grid gap-6 sm:grid-cols-3'>
-                                        <div className='grid gap-3'>
-                                            <Label htmlFor='category'>
-                                                Category
-                                            </Label>
-                                            <Select
-                                                defaultValue={product?.category}
-                                                onValueChange={(val: string) =>
-                                                    setValue("category", val)
-                                                }
-                                                
-                                            >
-                                                <SelectTrigger
-                                                    id='category'
-                                                    aria-label='Select category'
-                                                >
-                                                    <SelectValue placeholder='Select category' />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value='clothing'>
-                                                        Clothing
-                                                    </SelectItem>
-                                                    <SelectItem value='electronics'>
-                                                        Electronics
-                                                    </SelectItem>
-                                                    <SelectItem value='accessories'>
-                                                        Accessories
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className='grid gap-3'>
-                                            <Label htmlFor='subcategory'>
-                                                Subcategory (optional)
-                                            </Label>
-                                            <Select
-                                                onValueChange={(val: string) =>
-                                                    setValue("subCategory", val)
-                                                }
-                                            >
-                                                <SelectTrigger
-                                                    id='subcategory'
-                                                    aria-label='Select subcategory'
-                                                >
-                                                    <SelectValue placeholder='Select subcategory' />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value='t-shirts'>
-                                                        T-Shirts
-                                                    </SelectItem>
-                                                    <SelectItem value='hoodies'>
-                                                        Hoodies
-                                                    </SelectItem>
-                                                    <SelectItem value='sweatshirts'>
-                                                        Sweatshirts
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                </CardContent>
                             </Card>
                         </div>
-                        <div className='grid auto-rows-max items-start gap-4 lg:gap-8'>
-                            <Card x-chunk='dashboard-07-chunk-3'>
+                        <div className='grid auto-rows-max gap-4'>
+                            <Card x-chunk='dashboard-07-chunk-2'>
                                 <CardHeader>
-                                    <CardTitle>Product Status</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='grid gap-6'>
-                                        <div className='grid gap-3'>
-                                            <Label htmlFor='status'>
-                                                Status
-                                            </Label>
-                                            <Select
-                                                onValueChange={(
-                                                    val: "Publish" | "Draft"
-                                                ) => setValue("status", val)}
-                                            >
-                                                <SelectTrigger
-                                                    id='status'
-                                                    aria-label='Select status'
-                                                >
-                                                    <SelectValue placeholder='Select status' />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value='publish'>
-                                                        Publish
-                                                    </SelectItem>
-                                                    <SelectItem value='draft'>
-                                                        Draft
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card
-                                className='overflow-hidden'
-                                x-chunk='dashboard-07-chunk-4'
-                            >
-                                <CardHeader>
-                                    <CardTitle>Product Images</CardTitle>
+                                    <CardTitle>Status</CardTitle>
                                     <CardDescription>
-                                        Lipsum dolor sit amet, consectetur
-                                        adipiscing elit
+                                        Set product publish status
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className='grid gap-2'>
-                                        <img
-                                            alt='Product img'
-                                            className='aspect-square w-full rounded-md object-cover'
-                                            height='300'
-                                            src={
-                                                imagesPreview[
-                                                    currImagesPreviewIdx
-                                                ] ?? "/placeholder.svg"
+                                    <div className='grid gap-3'>
+                                        <Label htmlFor='name'>Status</Label>
+                                        <Select
+                                            defaultValue={getValues("status")}
+                                            onValueChange={(
+                                                val: "Publish" | "Draft"
+                                            ) => setValue("status", val)}
+                                        >
+                                            <SelectTrigger className='w-[180px]'>
+                                                <SelectValue placeholder='Select Status' />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value='Publish'>
+                                                    Publish
+                                                </SelectItem>
+                                                <SelectItem value='Draft'>
+                                                    Draft
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card x-chunk='dashboard-07-chunk-3'>
+                                <CardHeader>
+                                    <CardTitle>Categories</CardTitle>
+                                    <CardDescription>
+                                        Set product category
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className='grid gap-3 my-2'>
+                                        <Label htmlFor='category'>
+                                            Category
+                                        </Label>
+                                        <Select
+                                            defaultValue={
+                                                getValues("category") ?? "none"
+                                            } 
+                                            onValueChange={(val: string) =>
+                                                setValue("category", val)
                                             }
-                                            width='300'
+                                        >
+                                            <SelectTrigger className='w-[180px]'>
+                                                <SelectValue placeholder='Select Category' />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value='Footwear'>
+                                                    Footwear
+                                                </SelectItem>
+                                                <SelectItem value='Clothing'>
+                                                    Clothing
+                                                </SelectItem>
+                                                <SelectItem value='Accessories'>
+                                                    Accessories
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className='grid gap-3 my-2'>
+                                        <Label htmlFor='subCategory'>
+                                            Sub Category
+                                        </Label>
+                                        <Input
+                                            id='subCategory'
+                                            type='text'
+                                            {...register("subCategory")}
                                         />
-                                        <div className='grid grid-cols-3 gap-2'>
-                                            {imagesPreview.map((img, idx) => (
-                                                <span
-                                                    key={img}
-                                                    className={cn([
-                                                        idx ===
-                                                            currImagesPreviewIdx &&
-                                                            "border border-primary",
-                                                    ])}
-                                                    onClick={() =>
-                                                        setCurrImagesPreviewIdx(
-                                                            idx
-                                                        )
-                                                    }
-                                                >
-                                                    <img
-                                                        alt='Product img'
-                                                        className='aspect-square w-full rounded-md object-cover'
-                                                        height='84'
-                                                        src={
-                                                            img ??
-                                                            "/placeholder.svg"
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card x-chunk='dashboard-07-chunk-4'>
+                                <CardHeader>
+                                    <CardTitle>Media</CardTitle>
+                                    <CardDescription>
+                                        You can select multiple files
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className='grid gap-4'>
+                                        <div className='flex gap-2'>
+                                            {imagesPreview.map(
+                                                (image, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className={cn(
+                                                            "relative h-24 w-24 overflow-hidden rounded-md",
+                                                            currImagesPreviewIdx ===
+                                                                index &&
+                                                                "ring-2 ring-primary"
+                                                        )}
+                                                        onClick={() =>
+                                                            setCurrImagesPreviewIdx(
+                                                                index
+                                                            )
                                                         }
-                                                        width='84'
-                                                    />
-                                                </span>
-                                            ))}
-
-                                            <input
-                                                id='upload-product-image'
-                                                multiple
+                                                    >
+                                                        <img
+                                                            src={image}
+                                                            className='object-cover w-full h-full'
+                                                            alt={`Product preview ${
+                                                                index + 1
+                                                            }`}
+                                                        />
+                                                    </div>
+                                                )
+                                            )}
+                                        </div>
+                                        <div className='grid gap-2'>
+                                            <Label
+                                                className='sr-only'
+                                                htmlFor='images'
+                                            >
+                                                Images
+                                            </Label>
+                                            <Input
+                                                id='images'
                                                 type='file'
                                                 onChange={
                                                     handleProductImagesChange
                                                 }
-                                                hidden
+                                                multiple
                                             />
-                                            <label
-                                                htmlFor='upload-product-image'
-                                                className='flex aspect-square cursor-pointer w-full items-center justify-center rounded-md border border-dashed'
-                                            >
-                                                <Upload className='h-4 w-4 text-muted-foreground' />
-                                                <span className='sr-only'>
-                                                    Upload
-                                                </span>
-                                            </label>
                                         </div>
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
                     </div>
-                    <div className='flex items-center justify-center gap-2 md:hidden'>
-                        <Button variant='outline' size='sm'>
-                            Discard
-                        </Button>
-                        <Button size='sm' type='submit'>
+                    <div className='flex md:hidden'>
+                        <Button
+                            className='flex w-full items-center justify-center'
+                            size='sm'
+                            type='submit'
+                        >
                             Update Product
                         </Button>
                     </div>
