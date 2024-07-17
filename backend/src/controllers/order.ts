@@ -45,11 +45,11 @@ export const newOrder = asyncHandler(
         console.log(order);
         //Send Email
         await sendEmail({
-            data: { ...order,name:req.user.name },
+            data: { ...order, name: req.user.name },
             email: "bhartbhammar3336@gmail.com",
             queue: "send-order-placed-email",
             subject: "Your Order Placed Successfully",
-            template: "order-confirm.html",
+            template: "order-confirm.ejs",
         });
 
         const apiResponse = new ApiResponse(
