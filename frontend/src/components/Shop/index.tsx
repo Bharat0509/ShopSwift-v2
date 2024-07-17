@@ -55,9 +55,7 @@ export function Shop() {
         setFilters((prev) => ({ ...prev, categories: checked ? id : "" }));
     };
     useEffect(()=>{
-        // Navigate(`keyword=${
-        //         queryParams?.keyword || ""
-        //     }&category=${filters.categories}&rating[gte]=${filters.rating}`)
+     
         let searchParameters = `keyword=${
             queryParams?.keyword || ""
         }`;

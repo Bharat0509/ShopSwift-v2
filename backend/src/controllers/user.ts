@@ -2,9 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import {
-    sendEmail,
-    sendForgotPasswordEmail,
-    sendWelcomeEmail,
+    sendEmail
 } from "../emailTemplates";
 import User, { IUser } from "../models/user";
 import ApiError from "../utils/ApiError";
@@ -83,7 +81,7 @@ const handleLogin = asyncHandler(
             });
             return res.json(apiResponse);
         } else {
-            return next(new ApiError(401, "Unauthorized"));
+            return next(new ApiError(401, "Invalid Email or Password."));
         }
     }
 );

@@ -5,7 +5,7 @@ import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
 import mongoose from "mongoose";
-import { sendEmail, sendOrderPlacedEmail } from "../emailTemplates";
+import { sendEmail } from "../emailTemplates";
 
 // Create New Order
 export const newOrder = asyncHandler(
@@ -45,7 +45,7 @@ export const newOrder = asyncHandler(
         console.log(order);
         //Send Email
         await sendEmail({
-            data: { order },
+            data: { ...order,name:req.user.name },
             email: "bhartbhammar3336@gmail.com",
             queue: "send-order-placed-email",
             subject: "Your Order Placed Successfully",

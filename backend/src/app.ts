@@ -52,22 +52,28 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/order-confirmation", (req, res) => {
     const order = {
-        user: "John Doe1",
+        name: "John Doe1",
         _id: "12345",
         deliveredAt: "2024-07-15",
         paymentInfo: {
-            _id: "abc123",
-            status: "Paid",
+            id: "abc123",
+            status: "s",
         },
         orderItems: [
             { name: "Product 1", quantity: 2, price: 19.99 },
             { name: "Product 2", quantity: 1, price: 39.99 },
         ],
-        itemsPrice: 79.97,
-        totalPrice: 84.97,
+
+        paidAt: "2024-02-09T11:54:20.003Z",
+        itemsPrice: 2790.99,
+        taxPrice: 502.37,
+        shippingPrice: 0,
+        totalPrice: 3293.36,
+        orderStatus: "s",
+        createAt: "2024-02-09T10:38:33.742Z",
     };
 
-    res.render("order-confirmation", { order });
+    res.render("order-confirmation", { ...order });
 });
 // ====================================
 

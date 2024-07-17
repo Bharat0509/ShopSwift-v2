@@ -10,7 +10,8 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f6f6f6;
+      background-color: rgba(246, 246, 246, 0.9);
+      /* Reduced opacity */
     }
 
     .container {
@@ -19,6 +20,7 @@
       background-color: #ffffff;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
     }
 
     .header {
@@ -26,10 +28,13 @@
       padding: 20px;
       background-color: #ea580c;
       color: #ffffff;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
     }
 
     .content {
       margin: 20px 0;
+      color: #333333;
     }
 
     .footer {
@@ -37,6 +42,8 @@
       padding: 20px;
       background-color: #ea580c;
       color: #ffffff;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
     }
 
     .table-container {
@@ -52,6 +59,9 @@
       color: #ffffff;
       text-align: left;
       padding: 10px;
+      border-top-left-radius: 8px;
+      font-size: 20px;
+      border-top-right-radius: 8px;
     }
 
     table {
@@ -61,7 +71,7 @@
 
     th,
     td {
-      padding: 10px;
+      padding: 10px 16px;
       text-align: left;
       border-bottom: 1px solid #e0e0e0;
     }
@@ -86,38 +96,38 @@
     .button:hover {
       background-color: #e03c00;
     }
+
+    .order-details {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .customer-name {
+      font-weight: bold;
+      font-size: 18px;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
     <div class="header">
-      <h1>Your Order is Confirmed!</h1>
-      <p>Thank you for shopping with us.</p>
+      <h1>Your Order Confirmation</h1>
     </div>
     <div class="content">
-      <p>Hi <%= order.user %>,</p>
+      <p>Hi <span class="customer-name">
+          <%= name %>
+        </span>,</p>
+      <p>Thank you for shopping with us. Your <span class="order-details">order details</span> are as follows:</p>
       <div class="table-container">
-        <div class="table-header">Here's what you ordered:</div>
+        <div class="table-header">Order Details</div>
         <table>
           <tr>
-            <td>Order #: <%= order._id %>
-            </td>
-            <td>Order Arriving Date: <%= order.deliveredAt %>
-            </td>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Price</th>
           </tr>
-          <tr>
-            <td>Payment ID #: <%= order.paymentInfo._id %>
-            </td>
-            <td>Payment Status: <%= order.paymentInfo.status %>
-            </td>
-          </tr>
-          <tr>
-            <th>ITEM</th>
-            <th>QTY</th>
-            <th>COST</th>
-          </tr>
-          <% order.orderItems.forEach(item=> { %>
+          <% orderItems.forEach(item=> { %>
             <tr>
               <td>
                 <%= item.name %>
@@ -125,28 +135,40 @@
               <td>
                 <%= item.quantity %>
               </td>
-              <td>$<%= (item.price * item.quantity).toFixed(2) %>
-              </td>
+              <td><%= item.quantity * item.price %>.00</td>
             </tr>
             <% }); %>
               <tr>
-                <td><strong>Subtotal:</strong></td>
-                <td></td>
-                <td>$<%= order.itemsPrice %>
-                </td>
+                <td colspan="2" style="text-align: right;"><strong>Subtotal:</strong></td>
+                <td>₹<%= shippingPrice %>.00</td>
               </tr>
               <tr>
-                <td><strong>Total:</strong></td>
-                <td></td>
-                <td>$<%= order.totalPrice %>
-                </td>
+                <td colspan="2" style="text-align: right;"><strong>Total:</strong></td>
+                <td>₹<%= totalPrice %>.00</td>
+              </tr>
+              <tr>
+                <td colspan="3" style="text-align: left;"><strong>Payment Details:</strong></td>
+              </tr>
+              <tr>
+                <td colspan="2" style="text-align: left;">Payment ID:</td>
+                <td><%= paymentInfo.id %></td>
+              </tr>
+              <tr>
+                <td colspan="2" style="text-align: left;">Payment Status:</td>
+                <td><%= paymentInfo.status=="succeeded" ? "PAID" : "PENDING" %></td>
+              </tr>
+              <tr>
+                <td colspan="3" style="text-align: left;"><strong>Expected Delivery Date:</strong></td>
+              </tr>
+              <tr>
+                <td colspan="3" style="text-align: left;">Within 5 Days</td>
               </tr>
         </table>
       </div>
     </div>
     <div class="footer">
       <p>If you have any questions, please contact our support team at <a href="mailto:support@shopswift.com"
-          style="color: #ffffff;">support@shopswift.com</a></p>
+          style="color: #ffffff; text-decoration: underline;">support@shopswift.com</a></p>
       <p>© 2024 ShopSwift. All rights reserved.</p>
     </div>
   </div>
