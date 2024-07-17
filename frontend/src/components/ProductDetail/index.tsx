@@ -4,20 +4,10 @@ import { useGetProductsByIdQuery } from "@/redux/features/appApiSlice";
 import { addToCart } from "@/redux/features/appSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { toast } from "react-hot-toast";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { ICartItem, IProduct } from "@/lib/typing";
+
+import { IImage, IProduct } from "@/lib/typing";
 import { cn } from "@/lib/utils";
-import { StarIcon } from "lucide-react";
+import { ArrowUpIcon, StarIcon } from "lucide-react";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -26,76 +16,89 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "../ui/breadcrumb";
+import Reviews from "./Reviews";
+import Description from "./ProductDescription";
 import { Skeleton } from "../ui/skeleton";
-import ProductRating from "../ProductCard/product-rating";
+import { Label } from "../ui/label";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../ui/select";
+import { Button } from "../ui/button";
 import { ProductCard } from "../ProductCard/product-card";
+import { Separator } from "../ui/separator";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 const ProductInfo = () => {
     const param = useParams();
-    const [currPreviewImgIdx, setCurrPreviewImgIdx] = useState<number>(0);
     const dispatch = useAppDispatch();
+    const [currPreviewImgIdx, setCurrPreviewImgIdx] = useState(0);
+    const [productCartQty, setProductCartQty] = useState(1);
+    const [activeTab, setActiveTab] = useState("description");
     const { isLoading, data } = useGetProductsByIdQuery({
         productId: param.productId,
     });
-    const [productCartQty, setProductCartQty] = useState<number>(1);
-    const [activeTab, setActiveTab] = useState<string>("description");
-    const product: IProduct = data?.product;
-    const recommendedProducts: IProduct[] = data?.recommendedProducts;
+    const product = data?.product;
+    const recommendedProducts = data?.recommendedProducts;
 
-    const handleAddToCart = (e: React.FormEvent<HTMLButtonElement>) => {
+    const handleAddToCart = (
+        e: React.MouseEvent<HTMLButtonElement>
+    ) => {
         e.preventDefault();
-
-        const productToAdd: ICartItem = {
-            productId: param.productId as string,
-            name: product?.name as string,
+        const productToAdd = {
+            productId: param.productId,
+            name: product?.name,
             images: product.images,
             price: product.price,
             quantity: productCartQty,
         };
-
         dispatch(addToCart(productToAdd));
         toast.success("Item added to cart!");
     };
 
     return (
-        <>
-            <main>
-                <Breadcrumb className='flex container my-2 text-lg'>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link to='#' className='text-base'>
-                                    ShopSwift
-                                </Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link to='/products' className='text-base'>
-                                    Products
-                                </Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage className='text-base'>
-                                #{param.productId}
-                            </BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-                <div className='grid md:grid-cols-2 gap-6 lg:gap-12 items-start container px-4 mx-auto py-6'>
-                    <div className='grid gap-4'>
-                        <div className='grid md:grid-cols-5 gap-3 items-start'>
-                            <div className='hidden md:flex flex-col gap-3 items-start'>
-                                {product?.images?.map((img, idx) => (
+        <main>
+            <Breadcrumb className='flex container my-2 text-lg'>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to='#' className='text-base'>
+                                ShopSwift
+                            </Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to='/products' className='text-base'>
+                                Products
+                            </Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage className='text-base'>
+                            #{param.productId}
+                        </BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+            <div className='grid md:grid-cols-2 gap-6 lg:gap-12 items-start container px-4 mx-auto py-6'>
+                <div className='grid gap-4'>
+                    <div className='grid md:grid-cols-5 gap-3 items-start'>
+                        <div className='hidden md:flex flex-col gap-3 items-start'>
+                            {product?.images?.map(
+                                (img: IImage, idx: number) => (
                                     <button
                                         key={img?.url}
                                         className={cn([
                                             "border hover:border-gray-900 rounded-lg overflow-hidden transition-colors dark:hover:border-gray-50",
                                             idx === currPreviewImgIdx &&
-                                                "border-2 border-primary ",
+                                                "border-2 border-primary",
                                         ])}
                                         onClick={() =>
                                             setCurrPreviewImgIdx(idx)
@@ -109,85 +112,84 @@ const ProductInfo = () => {
                                             width='120'
                                         />
                                         <span className='sr-only'>
-                                            View Image 1
+                                            View Image {idx + 1}
                                         </span>
                                     </button>
-                                ))}
-                            </div>
-                            <div className='md:col-span-4'>
-                                {isLoading ? (
-                                    <img
-                                        alt='Product Image'
-                                        className='aspect-[2/3] animate-pulse h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
-                                        height='400'
-                                        src='/placeholder.svg'
-                                        width='600'
-                                    />
-                                ) : (
-                                    <img
-                                        alt='Product Image'
-                                        className='aspect-[2/3] h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
-                                        height='400'
-                                        src={
-                                            product?.images[currPreviewImgIdx]
-                                                ?.url
-                                        }
-                                        width='600'
-                                    />
-                                )}
-                            </div>
+                                )
+                            )}
+                        </div>
+                        <div className='md:col-span-4'>
+                            {isLoading ? (
+                                <Skeleton className='aspect-[2/3] h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800' />
+                            ) : (
+                                <img
+                                    alt='Product Image'
+                                    className='aspect-[2/3] h-[400px] md:h-[400px] lg:h-[575px] object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800'
+                                    src={
+                                        product?.images[currPreviewImgIdx]?.url
+                                    }
+                                    height='400'
+                                    width='600'
+                                />
+                            )}
                         </div>
                     </div>
-                    <div className='grid gap-4 md:gap-10 items-start'>
-                        <div className='grid gap-4'>
-                            {isLoading ? (
-                                <Skeleton className='h-8 w-3/4' />
-                            ) : (
-                                <h1 className='font-bold text-3xl lg:text-4xl'>
-                                    {data.product.name}
-                                </h1>
-                            )}
-                            <div>
-                                <p>
-                                    60% combed ringspun cotton/40% polyester
-                                    jersey tee.
-                                </p>
+                </div>
+                <div className='grid gap-4 md:gap-10 items-start'>
+                    <div className='grid gap-4'>
+                        {isLoading ? (
+                            <Skeleton className='h-8 w-3/4' />
+                        ) : (
+                            <h1 className='font-bold text-3xl lg:text-4xl'>
+                                {product?.name}
+                            </h1>
+                        )}
+                        <div>
+                            <div className='flex items-center gap-2 text-green-500'>
+                                <ArrowUpIcon className='h-5 w-5' />
+                                <span>100 bought in the last week</span>
                             </div>
-                            <div className='flex items-center gap-4'>
-                                {isLoading ? (
-                                    <Skeleton className='h-8 w-1/2' />
-                                ) : (
-                                    <>
-                                        <div className='flex items-center gap-0.5'>
-                                            <StarIcon className='w-5 h-5 fill-primary' />
-                                            <StarIcon className='w-5 h-5 fill-primary' />
-                                            <StarIcon className='w-5 h-5 fill-primary' />
-                                            <StarIcon className='w-5 h-5 fill-muted stroke-muted-foreground' />
-                                            <StarIcon className='w-5 h-5 fill-muted stroke-muted-foreground' />
-                                        </div>
-                                        <div className='text-sm text-gray-500 dark:text-gray-400'>
-                                            {product?.ratings} (
-                                            {product?.numOfReviews} reviews)
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                            <p>
+                                60% combed ringspun cotton/40% polyester jersey
+                                tee.
+                            </p>
+                        </div>
+                        <div className='flex items-center gap-4'>
                             {isLoading ? (
-                                <Skeleton className='h-8 w-1/4' />
+                                <Skeleton className='h-8 w-1/2' />
                             ) : (
-                                <div className='text-4xl font-bold'>
-                                    {!isLoading && `$${product.price}`}
-                                </div>
+                                <>
+                                    <div className='flex items-center gap-0.5'>
+                                        <StarIcon className='w-5 h-5 fill-primary' />
+                                        <StarIcon className='w-5 h-5 fill-primary' />
+                                        <StarIcon className='w-5 h-5 fill-primary' />
+                                        <StarIcon className='w-5 h-5 fill-muted stroke-muted-foreground' />
+                                        <StarIcon className='w-5 h-5 fill-muted stroke-muted-foreground' />
+                                    </div>
+                                    <div className='text-sm text-gray-500 dark:text-gray-400'>
+                                        {product?.ratings} (
+                                        {product?.numOfReviews} reviews)
+                                    </div>
+                                </>
                             )}
                         </div>
-                        <form className='grid gap-4 md:gap-10'>
-                            {isLoading ? (
-                                <Skeleton className='h-16 w-full' />
-                            ) : (
+                        {isLoading ? (
+                            <Skeleton className='h-8 w-1/4' />
+                        ) : (
+                            <div className='text-4xl font-bold'>
+                                {!isLoading && `$${product?.price}`}
+                            </div>
+                        )}
+                    </div>
+                    <form className='grid gap-4 md:gap-10'>
+                        {isLoading ? (
+                            <Skeleton className='h-16 w-full' />
+                        ) : (
+                            <>
                                 <div className='grid gap-2'>
                                     <Label
-                                        className='text-base'
                                         htmlFor='color'
+                                        className='text-base'
                                     >
                                         Color
                                     </Label>
@@ -196,44 +198,28 @@ const ProductInfo = () => {
                                         defaultValue='black'
                                         id='color'
                                     >
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='color-black'
-                                        >
-                                            <RadioGroupItem
-                                                id='color-black'
-                                                value='black'
-                                            />
-                                            Black
-                                        </Label>
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='color-white'
-                                        >
-                                            <RadioGroupItem
-                                                id='color-white'
-                                                value='white'
-                                            />
-                                            White
-                                        </Label>
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='color-blue'
-                                        >
-                                            <RadioGroupItem
-                                                id='color-blue'
-                                                value='blue'
-                                            />
-                                            Blue
-                                        </Label>
+                                        {["black", "white", "blue"].map(
+                                            (color) => (
+                                                <Label
+                                                    key={color}
+                                                    className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                                    htmlFor={`color-${color}`}
+                                                >
+                                                    <RadioGroupItem
+                                                        id={`color-${color}`}
+                                                        value={color}
+                                                    />
+                                                    {color
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        color.slice(1)}
+                                                </Label>
+                                            )
+                                        )}
                                     </RadioGroup>
                                 </div>
-                            )}
-                            {isLoading ? (
-                                <Skeleton className='h-16 w-full' />
-                            ) : (
                                 <div className='grid gap-2'>
-                                    <Label className='text-base' htmlFor='size'>
+                                    <Label htmlFor='size' className='text-base'>
                                         Size
                                     </Label>
                                     <RadioGroup
@@ -241,72 +227,33 @@ const ProductInfo = () => {
                                         defaultValue='m'
                                         id='size'
                                     >
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='size-xs'
-                                        >
-                                            <RadioGroupItem
-                                                id='size-xs'
-                                                value='xs'
-                                            />
-                                            XS
-                                        </Label>
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='size-s'
-                                        >
-                                            <RadioGroupItem
-                                                id='size-s'
-                                                value='s'
-                                            />
-                                            S
-                                        </Label>
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='size-m'
-                                        >
-                                            <RadioGroupItem
-                                                id='size-m'
-                                                value='m'
-                                            />
-                                            M
-                                        </Label>
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='size-l'
-                                        >
-                                            <RadioGroupItem
-                                                id='size-l'
-                                                value='l'
-                                            />
-                                            L
-                                        </Label>
-                                        <Label
-                                            className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
-                                            htmlFor='size-xl'
-                                        >
-                                            <RadioGroupItem
-                                                id='size-xl'
-                                                value='xl'
-                                            />
-                                            XL
-                                        </Label>
+                                        {["xs", "s", "m", "l", "xl"].map(
+                                            (size) => (
+                                                <Label
+                                                    key={size}
+                                                    className='border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800'
+                                                    htmlFor={`size-${size}`}
+                                                >
+                                                    <RadioGroupItem
+                                                        id={`size-${size}`}
+                                                        value={size}
+                                                    />
+                                                    {size.toUpperCase()}
+                                                </Label>
+                                            )
+                                        )}
                                     </RadioGroup>
                                 </div>
-                            )}
-                            {isLoading ? (
-                                <Skeleton className='h-16 w-full' />
-                            ) : (
                                 <div className='grid gap-2'>
                                     <Label
-                                        className='text-base'
                                         htmlFor='quantity'
+                                        className='text-base'
                                     >
                                         Quantity
                                     </Label>
                                     <Select
                                         defaultValue='1'
-                                        onValueChange={(e) =>
+                                        onValueChange={(e: string) =>
                                             setProductCartQty(parseInt(e))
                                         }
                                     >
@@ -314,81 +261,71 @@ const ProductInfo = () => {
                                             <SelectValue placeholder='Select a quantity' />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value='1'>1</SelectItem>
-                                            <SelectItem value='2'>2</SelectItem>
-                                            <SelectItem value='3'>3</SelectItem>
-                                            <SelectItem value='4'>4</SelectItem>
-                                            <SelectItem value='5'>5</SelectItem>
+                                            {[1, 2, 3, 4, 5].map((qty) => (
+                                                <SelectItem
+                                                    key={qty}
+                                                    value={`${qty}`}
+                                                >
+                                                    {qty}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
-                            )}
-                            <Button
-                                className='bg-[#ea580c] text-white hover:bg-[#ee5c11] w-full'
-                                disabled={isLoading}
-                                type='submit'
-                                onClick={handleAddToCart}
-                            >
-                                Add to cart
-                            </Button>
-                        </form>
-                    </div>
+                                <Button
+                                    className='bg-[#ea580c] text-white hover:bg-[#ee5c11] w-full'
+                                    disabled={isLoading}
+                                    type='submit'
+                                    onClick={handleAddToCart}
+                                >
+                                    Add to cart
+                                </Button>
+                            </>
+                        )}
+                    </form>
                 </div>
-                <div className='container mx-auto my-8'>
-                    <div className='flex justify-center mb-4'>
+            </div>
+            <div className='container mx-auto my-8'>
+                <div className='flex justify-center mb-4'>
+                    {["description", "reviews"].map((tab) => (
                         <button
-                            className={`px-4 py-2 ${
-                                activeTab === "description"
-                                    ? "border-b-2 border-primary"
-                                    : "border-b"
-                            }`}
-                            onClick={() => setActiveTab("description")}
+                            key={tab}
+                            className={cn("px-4 py-2 border-b-2", {
+                                "border-primary": activeTab === tab,
+                                "border-transparent": activeTab !== tab,
+                            })}
+                            onClick={() => setActiveTab(tab)}
                         >
-                            Description
+                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
                         </button>
-                        <button
-                            className={`px-4 py-2 ${
-                                activeTab === "reviews"
-                                    ? "border-b-2 border-primary"
-                                    : "border-b"
-                            }`}
-                            onClick={() => setActiveTab("reviews")}
-                        >
-                            Reviews
-                        </button>
-                    </div>
-                    {activeTab === "description" && (
-                        <div className='px-4'>
-                            <h2 className='text-xl font-bold mb-2'>
-                                Product Description
-                            </h2>
-                            <p>{product?.description}</p>
-                        </div>
-                    )}
-                    {activeTab === "reviews" && (
-                        <div className='px-4'>
-                            <h2 className='text-xl font-bold mb-2'>
-                                Customer Reviews
-                            </h2>
-                            <ProductRating ratings={product?.ratings} />
-                        </div>
-                    )}
+                    ))}
                 </div>
-                <Separator className='my-6' />
-                <div className='container mx-auto my-8'>
-                    <h2 className='text-2xl font-bold mb-4'>
-                        Recommended Products
-                    </h2>
-                    <div className='flex flex-wrap gap-4'>
-                        {recommendedProducts && recommendedProducts?.map(
-                            (recommendedProduct: IProduct) => (
-                               <ProductCard product={recommendedProduct} className="w-[14rem] h-[18rem]"/>
+                <Separator className='my-2' />
+                {activeTab === "description" && <Description />}
+                {activeTab === "reviews" && <Reviews />}
+            </div>
+            <div className='container mx-auto py-8'>
+                <h2 className='text-2xl font-bold mb-6'>
+                    Recommended Products
+                </h2>
+                <ScrollArea dir='ltr'>
+                    <div className='flex space-x-4 pb-4'>
+                        {(recommendedProducts as IProduct[])?.map(
+                            (product: IProduct) => (
+                                <ProductCard
+                                    key={product._id}
+                                    product={product}
+                                    className='w-[150px] md:w-[150px] lg:w-[200px]'
+                                    width={200}
+                                    height={200}
+                                />
                             )
                         )}
                     </div>
-                </div>
-            </main>
-        </>
+                    <ScrollBar orientation='horizontal' className='h-2' />
+                </ScrollArea>
+            </div>
+        </main>
     );
 };
 

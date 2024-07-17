@@ -1,5 +1,5 @@
 import { IProduct } from "@/lib/typing";
-import { cn } from "@/lib/utils";
+import { cn, formatted_price } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader } from "../ui/card";
@@ -26,7 +26,7 @@ export function ProductCard({
             <Card
                 className={cn(["p-0 h-fit border-none shadow-none"])}
             >
-                <CardHeader className='p-0.5'>
+                <CardHeader className='p-0.5 '>
                     <img
                         alt='Product Image'
                         className='rounded-t-lg object-cover aspect-square'
@@ -48,9 +48,9 @@ export function ProductCard({
                         </span>
                     </div>
 
-                    <div className='flex items-center justify-between'>
-                        <span className=' text-sm md:text-base lg:text-lg font-bold'>
-                            ${product.price}
+                    <div className='flex items-center justify-between gap-2'>
+                        <span className=' tex-xs sm:text-sm md:text-base font-bold'>
+                            {formatted_price(product.price)}
                         </span>
                         <Button className='z-10 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground whitespace-nowrap w-fit flex p-1 rounded-md text-sm font-medium md:p-2'>
                             Add to Cart

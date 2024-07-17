@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useGetProductsQuery } from "@/redux/features/appApiSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ProductCard } from "../ProductCard/product-card";
 import {
@@ -27,7 +27,8 @@ type FiltersState = {
 };
 
 export function Shop() {
-    const [searchParams] = useSearchParams();
+    const [searchParams,setSearchParams] = useSearchParams();
+    
     const queryParams = Object.fromEntries(searchParams.entries());
 
     const [filters, setFilters] = useState<FiltersState>({
@@ -53,6 +54,26 @@ export function Shop() {
     const handleCheckedChange = (id: string, checked: CheckedState) => {
         setFilters((prev) => ({ ...prev, categories: checked ? id : "" }));
     };
+    useEffect(()=>{
+        // Navigate(`keyword=${
+        //         queryParams?.keyword || ""
+        //     }&category=${filters.categories}&rating[gte]=${filters.rating}`)
+        let searchParameters = `keyword=${
+            queryParams?.keyword || ""
+        }`;
+        if(filters.categories.length)
+        {
+            searchParameters+=`&category=${filters.categories}`;
+        }
+        if(filters.rating>0)
+        {
+            searchParameters+=`&rating[gte]=${filters.rating}`;
+        }
+
+        setSearchParams(
+            searchParameters
+        );
+    },[filters.categories, filters.rating, isLoading, queryParams?.keyword, setSearchParams])
 
     return (
         <div className='grid h-[calc(100vh-64px)] fixed w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
