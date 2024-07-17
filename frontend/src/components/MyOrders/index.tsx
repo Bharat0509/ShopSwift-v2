@@ -38,7 +38,7 @@ import {
 import { Button } from "../ui/button";
 import { useEffect } from "react";
 
-export default function Component() {
+export default function MyOrders() {
     const { isLoading, data, error, refetch } = useGetMyOrdersQuery({
         refetchOnFocus: true,
         pollingInterval: 500,

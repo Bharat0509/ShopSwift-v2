@@ -34,16 +34,25 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { IProduct } from "@/lib/typing";
-import {  useAdminDeleteProductMutation,useGetAdminProductsQuery } from "@/redux/features/dashboardApiSlice";
+import {
+    useAdminDeleteProductMutation,
+    useGetAdminProductsQuery,
+} from "@/redux/features/dashboardApiSlice";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export default function ProductsDashboard() {
-    const { data, isLoading } = useGetAdminProductsQuery("dashboard-orders");
-    const [deleteProduct]=useAdminDeleteProductMutation()
-    const handleProductDelete=async (productId:string)=>{
-       
-            await deleteProduct({ productId});
-    }
+    const { data, isLoading, refetch } =
+        useGetAdminProductsQuery("dashboard-orders");
+    const [deleteProduct] = useAdminDeleteProductMutation();
+    const handleProductDelete = async (productId: string) => {
+        try {
+            await deleteProduct({ productId }).unwrap();
+            refetch();
+        } catch (error) {
+            toast.error("Failed to delete product");
+        }
+    };
     return (
         <Card>
             <CardHeader>

@@ -4,13 +4,10 @@ import Authentication from "./components/Authentication";
 import Cart from "./components/Cart";
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
-import Orders from "./components/Orders";
-import Order from "./components/Orders/Order";
 import AuthenticatedOutlet from "./components/Outlets/AuthOutlet";
 import DashboardOutlet from "./components/Outlets/DashboardOutlet";
 import Profile from "./components/Profile";
 import { Dashboard } from "./components/Dashboard";
-import OrdersDashboard from "./components/Orders";
 import ProductsDashboard from "./components/Dashboard/Products";
 import { AddProduct } from "./components/Dashboard/Products/Add";
 import { Shop } from "./components/Shop";
@@ -23,6 +20,10 @@ import WrapperScrollToTop from "./components/ui/scrollToTop";
 import ProcessPayment from "./components/Cart/ProcessPayment";
 import ProcessPaymentSuccess from "./components/Cart/ProcessPaymentSuccess";
 import { UpdateProduct } from "./components/Dashboard/Products/Edit";
+import MyOrder from "./components/MyOrders/MyOrder";
+import MyOrders from "./components/MyOrders";
+import DashboardOrders from "./components/Dashboard/Orders";
+import DashboardOrder from "./components/Dashboard/Orders/Order";
 
 function App() {
     return (
@@ -58,8 +59,8 @@ function App() {
                             path='process-payment/success'
                             element={<ProcessPaymentSuccess />}
                         />
-                        <Route path='orders' element={<Orders />} />
-                        <Route path='orders/:orderId' element={<Order />} />
+                        <Route path='orders' element={<MyOrders />} />
+                        <Route path='orders/:orderId' element={<MyOrder />} />
                     </Route>
                     <Route path='/dashboard' element={<DashboardOutlet />}>
                         <Route index element={<Dashboard />} />
@@ -69,8 +70,8 @@ function App() {
                         />
                         <Route path='products/add' element={<AddProduct />} />
                         <Route path='products/:id/edit' element={<UpdateProduct />} />
-                        <Route path='orders' element={<OrdersDashboard />} />
-                        <Route path='orders/:orderId' element={<Order />} />
+                        <Route path='orders' element={< DashboardOrders/>} />
+                        <Route path='orders/:orderId' element={<DashboardOrder />} />
                     </Route>
                 </Routes>
             </Router>

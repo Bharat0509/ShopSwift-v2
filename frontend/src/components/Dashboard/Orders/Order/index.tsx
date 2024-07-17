@@ -29,7 +29,7 @@ import { useUpdateOrderMutation } from "@/redux/features/dashboardApiSlice";
 import { toast } from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
-export default function Order() {
+export default function DashboardOrder() {
     const params = useParams();
     const orderId = params.orderId as string;
     const [updateOrder] = useUpdateOrderMutation();

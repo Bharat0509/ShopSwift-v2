@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { CustomError } from "@/lib/typing";
 import { cn } from "@/lib/utils";
 import {
     useUpdateProductMutation,
@@ -43,7 +44,7 @@ import { ChevronLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import * as z from "zod";
 
 const schema = z.object({
@@ -68,7 +69,6 @@ type IImage = {
 
 export function UpdateProduct() {
     const params = useParams();
-    const navigate = useNavigate();
 
     const { data, isLoading } = useGetProductByIdQuery({
         productId: params.id,
@@ -111,7 +111,7 @@ export function UpdateProduct() {
         }
     }, [product, setValue]);
 
-    const [updateProduct, result] = useUpdateProductMutation();
+    const [updateProduct] = useUpdateProductMutation();
 
     const handleProductImagesChange = (
         e: React.ChangeEvent<HTMLInputElement>
@@ -139,25 +139,27 @@ export function UpdateProduct() {
     const onSubmit: SubmitHandler<FormSchema> = async (productDetails) => {
         const toastId = toast.loading("Updating product...");
         const updatedProduct = { ...productDetails, images: imagesPreview };
-        await updateProduct({
-            productId: params.id,
-            updatedProduct
-        });
-
-        if (!result.isLoading && result.isSuccess) {
+        try {
+            await updateProduct({
+                productId: params.id,
+                updatedProduct,
+            }).unwrap();
             toast.success("Product Updated", { id: toastId });
-            navigate("/dashboard/products");
-        } else {
-            toast.error(`Failed to update product : ${result.error}`, {
-                id: toastId,
-            });
+        } catch (error) {
+            toast.error(
+                `Failed to update product : ${
+                    (error as CustomError)?.data?.error
+                }`,
+                {
+                    id: toastId,
+                }
+            );
         }
     };
 
     if (isLoading)
         return (
             <div className='h-full w-full m-auto'>
-                Loading ...
                 <Spinner />
             </div>
         );
@@ -373,7 +375,7 @@ export function UpdateProduct() {
                                         <Select
                                             defaultValue={
                                                 getValues("category") ?? "none"
-                                            } 
+                                            }
                                             onValueChange={(val: string) =>
                                                 setValue("category", val)
                                             }

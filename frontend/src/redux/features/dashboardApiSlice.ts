@@ -27,7 +27,7 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
         }),
         adminDeleteProduct: builder.mutation({
             query: ({ productId }) => ({
-                url: `/api/v1/admin/products/${productId}/delete`,
+                url: `/api/v1/admin/product/${productId}`,
                 method: "DELETE",
             }),
             transformResponse: ({ data }) => data,

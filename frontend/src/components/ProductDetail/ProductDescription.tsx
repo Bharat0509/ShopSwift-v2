@@ -7,8 +7,8 @@ export default function Description() {
             <section className='relative overflow-hidden rounded-lg w-full'>
                 <div className='absolute inset-0 bg-gradient-to-t from-background to-transparent' />
             </section>
-            <div className='container mx-auto px-4 py-12 md:px-6 md:py-20 lg:py-24 flex flex-col items-center'>
-                <div className='grid gap-8 md:grid-cols-1 md:gap-12 lg:gap-16 w-full'>
+            <div className='container mx-auto px-0 py-12 md:px-6 md:py-20 lg:py-24 flex flex-col items-center'>
+                <div className='md:w-3/4 grid gap-8 md:grid-cols-1 md:gap-12 lg:gap-16 '>
                     <div>
                         <h1 className='text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl'>
                             Handcrafted Leather Messenger Bag
@@ -82,12 +82,12 @@ export default function Description() {
                             
                         </div>
                     </div>
-                    <div className='grid gap-4 w-full'>
+                    <div className='grid gap-4 md:w-2/3 gap-y-12'>
                         <div className='grid gap-2'>
                             <h2 className='text-xl font-bold'>
                                 Product Specifications
                             </h2>
-                            <div className='grid gap-1 text-muted-foreground'>
+                            <div className='grid gap-1 text-muted-foreground '>
                                 <div className='flex justify-between'>
                                     <span>Material</span>
                                     <span>100% Italian Leather</span>

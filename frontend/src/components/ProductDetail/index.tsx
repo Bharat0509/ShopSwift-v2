@@ -6,7 +6,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { toast } from "react-hot-toast";
 
 import { IImage, IProduct } from "@/lib/typing";
-import { cn } from "@/lib/utils";
+import { cn, formatted_price } from "@/lib/utils";
 import { ArrowUpIcon, StarIcon } from "lucide-react";
 import {
     Breadcrumb,
@@ -45,9 +45,7 @@ const ProductInfo = () => {
     const product = data?.product;
     const recommendedProducts = data?.recommendedProducts;
 
-    const handleAddToCart = (
-        e: React.MouseEvent<HTMLButtonElement>
-    ) => {
+    const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         const productToAdd = {
             productId: param.productId,
@@ -177,7 +175,7 @@ const ProductInfo = () => {
                             <Skeleton className='h-8 w-1/4' />
                         ) : (
                             <div className='text-4xl font-bold'>
-                                {!isLoading && `$${product?.price}`}
+                                {!isLoading && formatted_price(product?.price)}
                             </div>
                         )}
                     </div>
@@ -244,7 +242,7 @@ const ProductInfo = () => {
                                         )}
                                     </RadioGroup>
                                 </div>
-                                <div className='grid gap-2'>
+                                <div className='grid gap-2 md:w-3/4'>
                                     <Label
                                         htmlFor='quantity'
                                         className='text-base'
@@ -273,7 +271,7 @@ const ProductInfo = () => {
                                     </Select>
                                 </div>
                                 <Button
-                                    className='bg-[#ea580c] text-white hover:bg-[#ee5c11] w-full'
+                                    className='bg-[#ea580c] text-white hover:bg-[#ee5c11] py-6 md:w-3/4'
                                     disabled={isLoading}
                                     type='submit'
                                     onClick={handleAddToCart}

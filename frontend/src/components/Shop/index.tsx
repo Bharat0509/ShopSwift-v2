@@ -136,7 +136,7 @@ export function Shop() {
                     </Breadcrumb>
                 </header>
                 <main className='flex items-center w-full p-2 md:p-4 overflow-scroll'>
-                    <div className='flex flex-wrap gap-2 gap-y-8 h-[85vh] pb-20'>
+                    <div className='p-4 md:p-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pb-20 gap-5 md:gap-10 h-[90vh] overflow-scroll w-full'>
                         {isLoading ? (
                             <div className='w-[80vw] h-full m-auto'>
                                 <Spinner />
@@ -146,9 +146,10 @@ export function Shop() {
                                 <ProductCard
                                     key={product._id}
                                     product={product}
-                                    className='w-[150px] sm:w-[200px] md:w-[200px] lg:w-[225px]'
-                                    width={300}
-                                    height={300}
+                                    // className='w-[150px] sm:w-[200px] md:w-[200px] lg:w-[225px]'
+
+                                    // width={300}
+                                    // height={300}
                                 />
                             ))
                         ) : (

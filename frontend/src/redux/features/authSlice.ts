@@ -6,7 +6,7 @@ import { RootState } from "../store";
 // import { AxiosError } from "axios";
 
 interface ProfileState {
-    status: "idle" | "loading" | "authenticated";
+    status: "idle" | "loading" | "authenticated" | "unauthenticated";
     loading: boolean;
     user: IUser | null;
     error: unknown;
@@ -41,13 +41,13 @@ const authSlice = createSlice({
         },
         authFailure(state, action: PayloadAction<unknown>) {
             state.loading = false;
-            state.status = "idle";
+            state.status = "unauthenticated";
             state.error = action.payload;
         },
 
         logOut(state) {
             state.loading = false;
-            state.status = "idle";
+            state.status = "unauthenticated";
             state.user = null;
             state.access_token = null;
             state.error = null;
