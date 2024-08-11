@@ -6,10 +6,7 @@ import { useGetProductsQuery } from "@/redux/features/appApiSlice";
 import Spinner from "../ui/spinner";
 import { ProductCard } from "./product-card";
 import { shuffleArray } from "@/lib/utils";
-interface IProductsData {
-    productsCount: number;
-    products: IProduct[];
-}
+
 export default function HomeProducts() {
     const { data, isSuccess } = useGetProductsQuery({
         searchQueryUrl: `/api/v1/products?category=all&rating[gte]=0`,
