@@ -1,9 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import {
-    sendEmail
-} from "../emailTemplates";
+import { sendEmail } from "../emailTemplates";
 import User, { IUser } from "../models/user";
 import ApiError from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -263,12 +261,6 @@ const handleForgotPassword = asyncHandler(
         // Construct reset password URL
 
         const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-
-        // await sendForgotPasswordEmail(
-        //     resetPasswordUrl,
-        //     user.name,
-        //     req.body.email
-        // );
 
         //Send Email
         await sendEmail({
