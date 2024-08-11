@@ -20,4 +20,25 @@ export function formatted_price(amount_usd:number){
    return "₹" + (amount_usd * USD_TO_INR_RATE).toFixed(2);
 }
     
+export function shuffleArray<T>(array: T[]): T[] {
+    // Make a copy of the original array
+    const newArray = [...array];
+    let currentIndex = newArray.length,
+        randomIndex;
+
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [newArray[currentIndex], newArray[randomIndex]] = [
+            newArray[randomIndex],
+            newArray[currentIndex],
+        ];
+    }
+
+    return newArray;
+}
 export const Axios = () => {};

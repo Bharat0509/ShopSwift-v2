@@ -5,6 +5,7 @@ import { IProduct } from "@/lib/typing";
 import { useGetProductsQuery } from "@/redux/features/appApiSlice";
 import Spinner from "../ui/spinner";
 import { ProductCard } from "./product-card";
+import { shuffleArray } from "@/lib/utils";
 interface IProductsData {
     productsCount: number;
     products: IProduct[];
@@ -31,7 +32,7 @@ export default function HomeProducts() {
                     {isSuccess ? (
                         <ScrollArea>
                             <div className='flex space-x-4 pb-4'>
-                                {(data as IProductsData).products.map(
+                                {shuffleArray<IProduct>(data?.products).map(
                                     (product: IProduct) => (
                                         <ProductCard
                                             key={product._id}
@@ -70,7 +71,7 @@ export default function HomeProducts() {
                     {isSuccess ? (
                         <ScrollArea>
                             <div className='flex space-x-4 pb-4'>
-                                {(data as IProductsData).products.map(
+                                {shuffleArray<IProduct>(data?.products).map(
                                     (product: IProduct) => (
                                         <ProductCard
                                             key={product._id}
@@ -109,7 +110,7 @@ export default function HomeProducts() {
                     {isSuccess ? (
                         <ScrollArea>
                             <div className='flex space-x-4 pb-4'>
-                                {(data as IProductsData).products.map(
+                                {shuffleArray<IProduct>(data?.products).map(
                                     (product: IProduct) => (
                                         <ProductCard
                                             key={product._id}
