@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "copyfiles -f src/emailTemplate/*.ejs dist/emailTemplate && nodemon dist/index.js",
+    "dev": "cp src/emailTemplate/*.ejs dist/emailTemplate && nodemon dist/index.js",
     "start": "tsc --watch"
   },
   "keywords": [],
