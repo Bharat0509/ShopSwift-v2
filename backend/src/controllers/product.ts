@@ -80,12 +80,12 @@ export const getAllProducts = asyncHandler(
 // Get query Products
 export const getAllSearchProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const data= await fetch(
+        const data = await fetch(
             `http://15.207.16.130:5000/search?query=${req.query.keyword}`
-        ).then(res=>res.json());
+        ).then((res) => res.json());
         const apiResponse = new ApiResponse(
             200,
-            {  products:data },
+            { products: data },
             "Products fetched successfully"
         );
         res.status(apiResponse.statusCode).json(apiResponse);
@@ -109,21 +109,18 @@ export const getAdminProducts = asyncHandler(
 export const getProductDetails = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product = await Product.findById(req.params.id);
-        console.log(
-            `http://15.207.16.130:5000/search?query="${product?.name}"`
-        );
-        
-         const data = await fetch(
-             `http://15.207.16.130:5000/search?query="${product?.name}"`
-         ).then((res) => res.json());
-       
+
+        const data = await fetch(
+            `${process.env.BACKEND_RECOMMENDATION_URI}/search?query="${product?.name}"`
+        ).then((res) => res.json());
+
         if (!product) {
             const apiError = new ApiError(404, "Product not found");
             return next(apiError);
         }
         const apiResponse = new ApiResponse(
             200,
-            { product,recommendedProducts:data },
+            { product, recommendedProducts: data },
             "Product details fetched successfully"
         );
         res.status(apiResponse.statusCode).json(apiResponse);
